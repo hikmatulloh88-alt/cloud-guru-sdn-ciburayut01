@@ -1,0 +1,24 @@
+# Secrets / local configuration
+.env
+*.env
+*.key
+*.pem
+*_secret*
+
+# Runtime / uploads / generated user data
+uploads/
+storage/
+absensi_sd/uploads/
+absensi_sd/assets/images/guru/
+absensi_sd/assets/images/siswa/
+absensi_sd/assets/images/ttd_guru/
+
+# Database dumps / backups
+*.sql
+*.sqlite
+*.db
+*.bak
+
+# Server/runtime
+.DS_Store
+Thumbs.db

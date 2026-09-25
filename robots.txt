@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /builder/
+Disallow: /config/
+Sitemap: https://sdnciburayut01.com/sitemap.php
