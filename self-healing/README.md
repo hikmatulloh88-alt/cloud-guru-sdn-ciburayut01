@@ -18,6 +18,8 @@ Self-Healing V1 is an isolated safety layer for Cloud Guru.
 5. Any future AI patch must be validated before deployment.
 6. Production changes must be reversible.
 7. Repairs are developed on isolated branches and proposed through pull requests.
+8. V1 patches require an exact old-text match, an explicit approval phrase, a backup, and PHP syntax validation.
+9. Failed PHP syntax validation automatically restores the pre-patch backup.
 
 ## Files
 - `health.php` - diagnostic endpoint.
@@ -25,6 +27,7 @@ Self-Healing V1 is an isolated safety layer for Cloud Guru.
 - `backup.php` - controlled file backup/restore helper.
 - `ai_analyzer.php` - read-only AI diagnosis.
 - `dashboard.php` - protected monitoring dashboard.
+- `patch_engine.php` - controlled, reversible PHP patch engine.
 - `config.example.php` - local configuration template.
 
 ## Installation
