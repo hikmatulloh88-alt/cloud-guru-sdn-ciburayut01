@@ -1,4 +1,9 @@
 <?php
+/* Cloud Guru Self-Healing: observability only; no business/data mutation. */
+require_once __DIR__.'/self-healing/logger.php';
+sh_install_error_handler();
+sh_install_shutdown_handler();
+
 require_once __DIR__.'/config/database.php';
 require_once __DIR__.'/config/school_stats.php';
 $pageSlug=strtolower(trim((string)($_GET['page']??'home')));

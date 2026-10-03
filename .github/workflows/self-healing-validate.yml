@@ -1,0 +1,76 @@
+name: Cloud Guru Self-Healing Validation
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches:
+      - self-healing-v1
+      - 'self-healing/**'
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.1', '8.2', '8.3']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring
+          tools: composer
+
+      - name: PHP syntax check
+        shell: bash
+        run: |
+          set -e
+          files="$(find . -type f \( -name '*.php' -o -name '*.phtml' -o -name '*.inc' \) \
+            -not -path './.git/*' \
+            -not -path './self-healing/runtime/*' \
+            -not -path './self-healing/backups/*')"
+          test -n "$files"
+          while IFS= read -r file; do
+            echo "Linting: $file"
+            php -l "$file"
+          done <<< "$files"
+
+  safety-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check protected paths
+        shell: bash
+        run: |
+          set -e
+          changed="$(git diff --name-only "${{ github.event.pull_request.base.sha || github.event.before }}" "${{ github.sha }}" 2>/dev/null || true)"
+          if [ -z "$changed" ]; then
+            echo "No diff list available; skipping path policy check."
+            exit 0
+          fi
+          echo "$changed"
+          if echo "$changed" | grep -E '(^|/)(\.env|config\.local\.php)$|(^|/)self-healing/runtime/|(^|/)self-healing/backups/' >/dev/null; then
+            echo "Protected secret/runtime path detected."
+            exit 1
+          fi
+
+  patch-engine-safe-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Run safe patch-engine harness
+        run: php self-healing/tests/patch_engine_test.php
