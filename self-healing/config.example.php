@@ -23,4 +23,9 @@ return [
 
     // Keep the first version conservative.
     'max_backup_bytes' => 10 * 1024 * 1024,
+
+    // Optional AI Analyzer. Keep the real key in config.local.php only.
+    'openai_api_key' => '',
+    'openai_model' => 'gpt-6-luna',
+    'openai_endpoint' => 'https://api.openai.com/v1/responses',
 ];
