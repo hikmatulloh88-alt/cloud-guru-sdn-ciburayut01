@@ -4,7 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/logger.php';
 
 $config = sh_config();
-$token = (string) ($_SERVER['HTTP_X_SELF_HEALING_TOKEN'] ?? $_GET['token'] ?? '');
+$token = (string) ($_SERVER['HTTP_X_SELF_HEALING_TOKEN'] ?? $_POST['token'] ?? $_GET['token'] ?? '');
 $expected = (string) ($config['access_token'] ?? '');
 
 if ($expected === '' || $expected === 'CHANGE_THIS_TO_A_LONG_RANDOM_TOKEN' ||
