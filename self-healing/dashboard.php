@@ -110,6 +110,15 @@ small{color:#64748b}.event{font-weight:700}.fatal{color:#b91c1c}.php{color:#a162
   </div>
 
   <div class="card section">
+    <h2>🤖 AI Analyzer</h2>
+    <p class="muted">Menganalisis error terbaru dan menghasilkan usulan patch. <b>Tidak mengubah file.</b></p>
+    <form method="post" action="ai_analyzer.php">
+      <input type="hidden" name="token" value="<?= htmlspecialchars($provided, ENT_QUOTES, 'UTF-8') ?>">
+      <button type="submit" style="border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;background:#172033;color:#fff">Analisis Error dengan AI</button>
+    </form>
+  </div>
+
+  <div class="card section">
     <h2>Riwayat Error Terbaru</h2>
     <?php if (!$recentErrors): ?>
       <p class="muted">Belum ada error yang tercatat.</p>
