@@ -60,3 +60,17 @@ jobs:
             echo "Protected secret/runtime path detected."
             exit 1
           fi
+
+  patch-engine-safe-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Run safe patch-engine harness
+        run: php self-healing/tests/patch_engine_test.php
