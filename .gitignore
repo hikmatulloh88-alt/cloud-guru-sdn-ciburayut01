@@ -5,6 +5,11 @@
 *.pem
 *_secret*
 
+# Self-Healing local secrets/runtime
+self-healing/config.local.php
+self-healing/runtime/
+self-healing/backups/
+
 # Runtime / uploads / generated user data
 uploads/
 storage/
