@@ -558,54 +558,28 @@ body{background:#f5f8fb!important;color:#102a43}
  .published-wrap .school-live-stat{min-height:118px!important}
 }
 </style>
+</style><style id="public-native-menu-fix">
+/* Native disclosure menu: opens without relying on JavaScript execution. */
+.ph-menu-wrap{position:static;display:flex;align-items:center;min-width:0}
+.ph-menu{display:none;list-style:none;cursor:pointer;user-select:none}
+.ph-menu::-webkit-details-marker{display:none}
+.ph-menu::marker{content:""}
+.ph-menu-open{display:inline}
+.ph-menu-close{display:none}
+.ph-menu-wrap[open] .ph-menu-open{display:none}
+.ph-menu-wrap[open] .ph-menu-close{display:inline}
+@media(max-width:760px){
+  .ph-menu-wrap{display:block;position:static}
+  .ph-menu{display:grid;place-items:center;margin-left:auto;border:0;width:42px;height:42px;border-radius:11px;background:#f1f5f9;color:#334e68;font-size:22px;cursor:pointer;position:relative;z-index:1102;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+  .ph-menu-wrap .ph-nav{display:none;position:absolute;left:4%;right:4%;top:70px;z-index:1101;flex-direction:column;align-items:stretch;padding:10px;background:rgba(255,255,255,.98);border:1px solid #e6ebf1;border-radius:16px;box-shadow:0 18px 45px rgba(16,42,67,.16)}
+  .ph-menu-wrap[open] .ph-nav{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+  .ph-menu-wrap .ph-nav a{text-align:center}
+  .ph-menu-wrap .ph-nav a.ph-cta{margin-left:0;margin-top:3px}
+}
 </style></head><body>
 <header class="published-header<?= $header['header_transparent']?' header-transparent':'' ?><?= $header['header_overlay']?' header-overlay':'' ?>">
 <div class="ph-brand"><?php if($settings['logo_url']):?><img src="<?=htmlspecialchars($settings['logo_url'])?>" alt="Logo sekolah"><?php else:?><div class="ph-logo">01</div><?php endif;?><div class="ph-copy"><b><?=htmlspecialchars($settings['site_name'])?></b><small><?=htmlspecialchars($settings['tagline'])?></small></div></div>
-<?php if($navbar['navbar_enabled']):?><button class="ph-menu" type="button" aria-label="Buka menu" aria-expanded="false">☰</button><nav class="ph-nav nav-style-<?=htmlspecialchars($navbar['navbar_style'])?>"><?php foreach($navbar['navbar_items'] as $it):?><a href="<?=htmlspecialchars($it['url']??'#')?>"><?=htmlspecialchars($it['label']??'Menu')?></a><?php endforeach;?><a class="ph-cta" href="<?=htmlspecialchars($navbar['navbar_cta_url'])?>"><?=htmlspecialchars($navbar['navbar_cta_text'])?></a></nav><?php endif;?></header>
+<?php if($navbar['navbar_enabled']):?><details class="ph-menu-wrap"><summary class="ph-menu" aria-label="Buka menu"><span class="ph-menu-open">☰</span><span class="ph-menu-close">✕</span></summary><nav class="ph-nav nav-style-<?=htmlspecialchars($navbar['navbar_style'])?>"><?php foreach($navbar['navbar_items'] as $it):?><a href="<?=htmlspecialchars($it['url']??'#')?>"><?=htmlspecialchars($it['label']??'Menu')?></a><?php endforeach;?><a class="ph-cta" href="<?=htmlspecialchars($navbar['navbar_cta_url'])?>"><?=htmlspecialchars($navbar['navbar_cta_text'])?></a></nav></details><?php endif;?></header
 <main class="published-wrap"><?= $published ?></main>
 <footer class="published-footer" style="background:<?=htmlspecialchars($settings['footer_bg']??'#102a43')?>;color:<?=htmlspecialchars($settings['footer_text_color']??'#fff')?>"><div class="footer-inner footer-cols-<?=htmlspecialchars($settings['footer_layout']??'3')?>"><?php if(($settings['footer_show_logo']??'1')==='1'):?><div class="footer-brand"><b><?=htmlspecialchars($settings['site_name'])?></b><br><span><?=htmlspecialchars($settings['tagline'])?></span></div><?php endif;?><?php if(($settings['footer_show_quicklinks']??'1')==='1'):?><div class="footer-links"><b>Menu Cepat</b><?php foreach(preg_split('/\r?\n/',(string)($settings['footer_quicklinks']??'')) as $line){$parts=explode('|',$line,2);if(count($parts)===2&&trim($parts[0])):?><a href="<?=htmlspecialchars($parts[1])?>"><?=htmlspecialchars($parts[0])?></a><?php endif;}?></div><?php endif;?><?php if(($settings['footer_show_contact']??'1')==='1'):?><div class="footer-contact"><b>Hubungi Kami</b><span><?=htmlspecialchars($settings['address'])?></span><?php if($settings['phone']):?><span><?=htmlspecialchars($settings['phone'])?></span><?php endif;?><?php if($settings['email']):?><span><?=htmlspecialchars($settings['email'])?></span><?php endif;?></div><?php endif;?><?php if(($settings['footer_show_social']??'1')==='1'):?><div class="footer-social"><b>Sosial Media</b><?php if(!empty($settings['facebook_url'])):?><a href="<?=htmlspecialchars(safeExternalUrl($settings['facebook_url']))?>" target="_blank" rel="noopener">Facebook</a><?php endif;?><?php if(!empty($settings['instagram_url'])):?><a href="<?=htmlspecialchars(safeExternalUrl($settings['instagram_url']))?>" target="_blank" rel="noopener">Instagram</a><?php endif;?><?php if(!empty($settings['youtube_url'])):?><a href="<?=htmlspecialchars(safeExternalUrl($settings['youtube_url']))?>" target="_blank" rel="noopener">YouTube</a><?php endif;?><?php if(empty($settings['facebook_url'])&&empty($settings['instagram_url'])&&empty($settings['youtube_url'])):?><span>Media sosial sekolah akan ditambahkan.</span><?php endif;?></div><?php endif;?></div><div class="footer-copy"><?=htmlspecialchars($settings['footer_text'])?></div></footer>
-<script>
-(function(){
-  function initPublicMenu(){
-    const btn=document.querySelector('.ph-menu');
-    const nav=document.querySelector('.ph-nav');
-    if(!btn||!nav||btn.dataset.menuReady==='1')return;
-    btn.dataset.menuReady='1';
-
-    function setMenuOpen(open){
-      nav.classList.toggle('open',open);
-      /* Inline fallback keeps the menu usable if another stylesheet overrides .open. */
-      nav.style.display=open?'flex':'';
-      nav.style.visibility=open?'visible':'';
-      nav.style.opacity=open?'1':'';
-      nav.style.pointerEvents=open?'auto':'';
-      btn.setAttribute('aria-expanded',open?'true':'false');
-      btn.setAttribute('aria-label',open?'Tutup menu':'Buka menu');
-      btn.textContent=open?'✕':'☰';
-    }
-
-    btn.addEventListener('click',function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      setMenuOpen(btn.getAttribute('aria-expanded')!=='true');
-    });
-
-    nav.querySelectorAll('a').forEach(function(a){
-      a.addEventListener('click',function(){setMenuOpen(false);});
-    });
-
-    document.addEventListener('click',function(e){
-      if(window.innerWidth<=760 && !nav.contains(e.target) && !btn.contains(e.target)){
-        setMenuOpen(false);
-      }
-    });
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',initPublicMenu,{once:true});
-  }else{
-    initPublicMenu();
-  }
-})();
-</script>
 </body></html>
