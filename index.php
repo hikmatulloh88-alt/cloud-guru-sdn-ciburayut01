@@ -576,6 +576,15 @@ body{background:#f5f8fb!important;color:#102a43}
   .ph-menu-wrap .ph-nav a{text-align:center}
   .ph-menu-wrap .ph-nav a.ph-cta{margin-left:0;margin-top:3px}
 }
+</style>
+<style id="public-menu-mobile-last-resort">
+@media(max-width:760px){
+  .published-header .ph-menu-wrap{display:block!important;position:static!important;flex:0 0 42px!important;z-index:12000!important}
+  .published-header .ph-menu-wrap>summary.ph-menu{display:grid!important;place-items:center!important;position:relative!important;z-index:12002!important;touch-action:manipulation!important;cursor:pointer!important}
+  .published-header .ph-menu-wrap>.ph-nav{position:fixed!important;top:76px!important;left:12px!important;right:12px!important;width:auto!important;max-height:calc(100dvh - 92px)!important;overflow-y:auto!important;z-index:12001!important;background:#fff!important;color:#102a43!important;border:1px solid #dbe4ee!important;border-radius:16px!important;padding:12px!important;box-shadow:0 18px 50px rgba(15,23,42,.28)!important;flex-direction:column!important;align-items:stretch!important}
+  .published-header .ph-menu-wrap>.ph-nav a{display:block!important;color:#334e68!important;text-align:center!important;padding:13px!important;font-size:15px!important}
+  .published-header .ph-menu-wrap>.ph-nav a.ph-cta{color:#fff!important;margin:4px 0 0!important}
+}
 </style></head><body>
 <header class="published-header<?= $header['header_transparent']?' header-transparent':'' ?><?= $header['header_overlay']?' header-overlay':'' ?>">
 <div class="ph-brand"><?php if($settings['logo_url']):?><img src="<?=htmlspecialchars($settings['logo_url'])?>" alt="Logo sekolah"><?php else:?><div class="ph-logo">01</div><?php endif;?><div class="ph-copy"><b><?=htmlspecialchars($settings['site_name'])?></b><small><?=htmlspecialchars($settings['tagline'])?></small></div></div>
@@ -584,17 +593,46 @@ body{background:#f5f8fb!important;color:#102a43}
 <footer class="published-footer" style="background:<?=htmlspecialchars($settings['footer_bg']??'#102a43')?>;color:<?=htmlspecialchars($settings['footer_text_color']??'#fff')?>"><div class="footer-inner footer-cols-<?=htmlspecialchars($settings['footer_layout']??'3')?>"><?php if(($settings['footer_show_logo']??'1')==='1'):?><div class="footer-brand"><b><?=htmlspecialchars($settings['site_name'])?></b><br><span><?=htmlspecialchars($settings['tagline'])?></span></div><?php endif;?><?php if(($settings['footer_show_quicklinks']??'1')==='1'):?><div class="footer-links"><b>Menu Cepat</b><?php foreach(preg_split('/\r?\n/',(string)($settings['footer_quicklinks']??'')) as $line){$parts=explode('|',$line,2);if(count($parts)===2&&trim($parts[0])):?><a href="<?=htmlspecialchars($parts[1])?>"><?=htmlspecialchars($parts[0])?></a><?php endif;}?></div><?php endif;?><?php if(($settings['footer_show_contact']??'1')==='1'):?><div class="footer-contact"><b>Hubungi Kami</b><span><?=htmlspecialchars($settings['address'])?></span><?php if($settings['phone']):?><span><?=htmlspecialchars($settings['phone'])?></span><?php endif;?><?php if($settings['email']):?><span><?=htmlspecialchars($settings['email'])?></span><?php endif;?></div><?php endif;?><?php if(($settings['footer_show_social']??'1')==='1'):?><div class="footer-social"><b>Sosial Media</b><?php if(!empty($settings['facebook_url'])):?><a href="<?=htmlspecialchars(safeExternalUrl($settings['facebook_url']))?>" target="_blank" rel="noopener">Facebook</a><?php endif;?><?php if(!empty($settings['instagram_url'])):?><a href="<?=htmlspecialchars(safeExternalUrl($settings['instagram_url']))?>" target="_blank" rel="noopener">Instagram</a><?php endif;?><?php if(!empty($settings['youtube_url'])):?><a href="<?=htmlspecialchars(safeExternalUrl($settings['youtube_url']))?>" target="_blank" rel="noopener">YouTube</a><?php endif;?><?php if(empty($settings['facebook_url'])&&empty($settings['instagram_url'])&&empty($settings['youtube_url'])):?><span>Media sosial sekolah akan ditambahkan.</span><?php endif;?></div><?php endif;?></div><div class="footer-copy"><?=htmlspecialchars($settings['footer_text'])?></div></footer>
 <script id="public-menu-responsive-init">
 (function(){
-  function syncPublicMenu(){
+  function initPublicMenu(){
     var menu=document.querySelector('.ph-menu-wrap');
     if(!menu) return;
-    menu.open=window.matchMedia('(min-width: 761px)').matches;
+    var trigger=menu.querySelector('summary.ph-menu');
+    var nav=menu.querySelector('.ph-nav');
+    if(!trigger || !nav) return;
+    function setOpen(open){
+      menu.open=!!open;
+      if(window.matchMedia('(max-width: 760px)').matches){
+        nav.style.setProperty('display', open ? 'flex' : 'none', 'important');
+        nav.style.setProperty('visibility', open ? 'visible' : 'hidden', 'important');
+        nav.style.setProperty('opacity', open ? '1' : '0', 'important');
+        nav.style.setProperty('pointer-events', open ? 'auto' : 'none', 'important');
+      }else{
+        nav.style.removeProperty('display');
+        nav.style.removeProperty('visibility');
+        nav.style.removeProperty('opacity');
+        nav.style.removeProperty('pointer-events');
+      }
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    trigger.addEventListener('click',function(event){
+      if(window.matchMedia('(max-width: 760px)').matches){
+        event.preventDefault();
+        event.stopPropagation();
+        setOpen(!menu.open);
+      }
+    },true);
+    menu.querySelectorAll('.ph-nav a').forEach(function(link){
+      link.addEventListener('click',function(){ setOpen(false); });
+    });
+    if(window.matchMedia('(min-width: 761px)').matches) setOpen(true);
+    else setOpen(false);
+    window.addEventListener('resize',function(){
+      if(window.matchMedia('(min-width: 761px)').matches) setOpen(true);
+      else setOpen(false);
+    },{passive:true});
   }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',syncPublicMenu,{once:true});
-  }else{
-    syncPublicMenu();
-  }
-  window.addEventListener('resize',syncPublicMenu,{passive:true});
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initPublicMenu,{once:true});
+  else initPublicMenu();
 })();
 </script>
 </body></html>
