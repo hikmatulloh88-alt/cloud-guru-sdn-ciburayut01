@@ -3,3 +3,6 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/sdncibur/public_html/
     - /bin/cp index.php $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/self-healing
+    - /bin/cp self-healing/logger.php $DEPLOYPATH/self-healing/
+    - /bin/cp self-healing/patch_engine.php $DEPLOYPATH/self-healing/
