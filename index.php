@@ -566,28 +566,46 @@ body{background:#f5f8fb!important;color:#102a43}
 <footer class="published-footer" style="background:<?=htmlspecialchars($settings['footer_bg']??'#102a43')?>;color:<?=htmlspecialchars($settings['footer_text_color']??'#fff')?>"><div class="footer-inner footer-cols-<?=htmlspecialchars($settings['footer_layout']??'3')?>"><?php if(($settings['footer_show_logo']??'1')==='1'):?><div class="footer-brand"><b><?=htmlspecialchars($settings['site_name'])?></b><br><span><?=htmlspecialchars($settings['tagline'])?></span></div><?php endif;?><?php if(($settings['footer_show_quicklinks']??'1')==='1'):?><div class="footer-links"><b>Menu Cepat</b><?php foreach(preg_split('/\r?\n/',(string)($settings['footer_quicklinks']??'')) as $line){$parts=explode('|',$line,2);if(count($parts)===2&&trim($parts[0])):?><a href="<?=htmlspecialchars($parts[1])?>"><?=htmlspecialchars($parts[0])?></a><?php endif;}?></div><?php endif;?><?php if(($settings['footer_show_contact']??'1')==='1'):?><div class="footer-contact"><b>Hubungi Kami</b><span><?=htmlspecialchars($settings['address'])?></span><?php if($settings['phone']):?><span><?=htmlspecialchars($settings['phone'])?></span><?php endif;?><?php if($settings['email']):?><span><?=htmlspecialchars($settings['email'])?></span><?php endif;?></div><?php endif;?><?php if(($settings['footer_show_social']??'1')==='1'):?><div class="footer-social"><b>Sosial Media</b><?php if(!empty($settings['facebook_url'])):?><a href="<?=htmlspecialchars(safeExternalUrl($settings['facebook_url']))?>" target="_blank" rel="noopener">Facebook</a><?php endif;?><?php if(!empty($settings['instagram_url'])):?><a href="<?=htmlspecialchars(safeExternalUrl($settings['instagram_url']))?>" target="_blank" rel="noopener">Instagram</a><?php endif;?><?php if(!empty($settings['youtube_url'])):?><a href="<?=htmlspecialchars(safeExternalUrl($settings['youtube_url']))?>" target="_blank" rel="noopener">YouTube</a><?php endif;?><?php if(empty($settings['facebook_url'])&&empty($settings['instagram_url'])&&empty($settings['youtube_url'])):?><span>Media sosial sekolah akan ditambahkan.</span><?php endif;?></div><?php endif;?></div><div class="footer-copy"><?=htmlspecialchars($settings['footer_text'])?></div></footer>
 <script>
 (function(){
-  const btn=document.querySelector('.ph-menu');
-  const nav=document.querySelector('.ph-nav');
-  if(!btn||!nav)return;
-  btn.addEventListener('click',function(){
-    const open=nav.classList.toggle('open');
-    btn.setAttribute('aria-expanded',open?'true':'false');
-    btn.textContent=open?'✕':'☰';
-  });
-  nav.querySelectorAll('a').forEach(function(a){
-    a.addEventListener('click',function(){
-      nav.classList.remove('open');
-      btn.setAttribute('aria-expanded','false');
-      btn.textContent='☰';
-    });
-  });
-  document.addEventListener('click',function(e){
-    if(window.innerWidth<=760 && !nav.contains(e.target) && !btn.contains(e.target)){
-      nav.classList.remove('open');
-      btn.setAttribute('aria-expanded','false');
-      btn.textContent='☰';
+  function initPublicMenu(){
+    const btn=document.querySelector('.ph-menu');
+    const nav=document.querySelector('.ph-nav');
+    if(!btn||!nav||btn.dataset.menuReady==='1')return;
+    btn.dataset.menuReady='1';
+
+    function setMenuOpen(open){
+      nav.classList.toggle('open',open);
+      /* Inline fallback keeps the menu usable if another stylesheet overrides .open. */
+      nav.style.display=open?'flex':'';
+      nav.style.visibility=open?'visible':'';
+      nav.style.opacity=open?'1':'';
+      nav.style.pointerEvents=open?'auto':'';
+      btn.setAttribute('aria-expanded',open?'true':'false');
+      btn.setAttribute('aria-label',open?'Tutup menu':'Buka menu');
+      btn.textContent=open?'✕':'☰';
     }
-  });
+
+    btn.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      setMenuOpen(btn.getAttribute('aria-expanded')!=='true');
+    });
+
+    nav.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click',function(){setMenuOpen(false);});
+    });
+
+    document.addEventListener('click',function(e){
+      if(window.innerWidth<=760 && !nav.contains(e.target) && !btn.contains(e.target)){
+        setMenuOpen(false);
+      }
+    });
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',initPublicMenu,{once:true});
+  }else{
+    initPublicMenu();
+  }
 })();
 </script>
 </body></html>
