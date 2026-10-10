@@ -17,7 +17,7 @@ require_once __DIR__ . '/backup.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-function sh_patch_json(int $status, array $data): never
+function sh_patch_json(int $status, array $data): void
 {
     http_response_code($status);
     echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
