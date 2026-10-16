@@ -65,6 +65,18 @@ function gdrive_require_tables(): void {
     if (!in_array('token_expires_at', $columns, true)) {
         $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN token_expires_at DATETIME DEFAULT NULL");
     }
+    // Older installations may predate the folder columns; add them before any UPDATE uses them.
+    $folderColumns = [
+        'root_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+        'administrasi_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+        'perencanaan_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+        'asesmen_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+    ];
+    foreach ($folderColumns as $column => $definition) {
+        if (!in_array($column, $columns, true)) {
+            $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$column` $definition");
+        }
+    }
     $pdo->exec("UPDATE google_drive_connections SET access_token_expires_at=COALESCE(access_token_expires_at,token_expires_at), token_expires_at=COALESCE(token_expires_at,access_token_expires_at)");
 }
 function gdrive_store_tokens(int $userId, array $tokens): void {
