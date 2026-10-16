@@ -3,6 +3,39 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/auth.php';
 wajib_login();
 require_once __DIR__ . '/../config/google_drive_lib.php';
+// Repair legacy Google Drive connection schemas before any page query uses folder columns.
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS google_drive_connections (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL UNIQUE,
+        google_email VARCHAR(255) DEFAULT NULL,
+        google_name VARCHAR(255) DEFAULT NULL,
+        refresh_token_enc MEDIUMTEXT DEFAULT NULL,
+        access_token_enc MEDIUMTEXT DEFAULT NULL,
+        access_token_expires_at DATETIME DEFAULT NULL,
+        token_expires_at DATETIME DEFAULT NULL,
+        root_folder_id VARCHAR(255) DEFAULT NULL,
+        administrasi_folder_id VARCHAR(255) DEFAULT NULL,
+        perencanaan_folder_id VARCHAR(255) DEFAULT NULL,
+        asesmen_folder_id VARCHAR(255) DEFAULT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_gdrive_user (user_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    $driveColumns = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+    foreach ([
+        'root_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+        'administrasi_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+        'perencanaan_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+        'asesmen_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+    ] as $driveColumn => $driveDefinition) {
+        if (!in_array($driveColumn, $driveColumns, true)) {
+            $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$driveColumn` $driveDefinition");
+        }
+    }
+} catch (Throwable $schemaError) {
+    error_log('Cloud Guru Drive schema repair: ' . $schemaError->getMessage());
+}
 gdrive_require_tables();
 $userId=gdrive_user_id();
 $folders=['root_folder_id'=>'Semua File','administrasi_folder_id'=>'Administrasi Guru','perencanaan_folder_id'=>'Perencanaan','asesmen_folder_id'=>'Asesmen'];
