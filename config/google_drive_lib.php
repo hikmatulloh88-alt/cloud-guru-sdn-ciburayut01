@@ -48,6 +48,7 @@ function gdrive_require_tables(): void {
       refresh_token_enc MEDIUMTEXT DEFAULT NULL,
       access_token_enc MEDIUMTEXT DEFAULT NULL,
       access_token_expires_at DATETIME DEFAULT NULL,
+      token_expires_at DATETIME DEFAULT NULL,
       root_folder_id VARCHAR(255) DEFAULT NULL,
       administrasi_folder_id VARCHAR(255) DEFAULT NULL,
       perencanaan_folder_id VARCHAR(255) DEFAULT NULL,
@@ -56,6 +57,15 @@ function gdrive_require_tables(): void {
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_gdrive_user (user_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    // Migrate older installations safely: some earlier builds used token_expires_at.
+    $columns = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('access_token_expires_at', $columns, true)) {
+        $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN access_token_expires_at DATETIME DEFAULT NULL");
+    }
+    if (!in_array('token_expires_at', $columns, true)) {
+        $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN token_expires_at DATETIME DEFAULT NULL");
+    }
+    $pdo->exec("UPDATE google_drive_connections SET access_token_expires_at=COALESCE(access_token_expires_at,token_expires_at), token_expires_at=COALESCE(token_expires_at,access_token_expires_at)");
 }
 function gdrive_store_tokens(int $userId, array $tokens): void {
     global $pdo;
@@ -67,9 +77,9 @@ function gdrive_store_tokens(int $userId, array $tokens): void {
     $refresh = !empty($tokens['refresh_token']) ? gdrive_encrypt((string)$tokens['refresh_token']) : ($old['refresh_token_enc'] ?? null);
     if (!$refresh) throw new RuntimeException('Google tidak mengirim refresh token. Cabut akses aplikasi dari akun Google lalu hubungkan ulang.');
     $access = gdrive_encrypt((string)$tokens['access_token']);
-    $stmt = $pdo->prepare("INSERT INTO google_drive_connections (user_id,refresh_token_enc,access_token_enc,access_token_expires_at)
-      VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE refresh_token_enc=VALUES(refresh_token_enc),access_token_enc=VALUES(access_token_enc),access_token_expires_at=VALUES(access_token_expires_at)");
-    $stmt->execute([$userId,$refresh,$access,$expires]);
+    $stmt = $pdo->prepare("INSERT INTO google_drive_connections (user_id,refresh_token_enc,access_token_enc,access_token_expires_at,token_expires_at)
+      VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE refresh_token_enc=VALUES(refresh_token_enc),access_token_enc=VALUES(access_token_enc),access_token_expires_at=VALUES(access_token_expires_at),token_expires_at=VALUES(token_expires_at)");
+    $stmt->execute([$userId,$refresh,$access,$expires,$expires]);
 }
 function gdrive_access_token(int $userId): string {
     global $pdo;
@@ -84,7 +94,7 @@ function gdrive_access_token(int $userId): string {
     $data=is_string($raw)?json_decode($raw,true):null;
     if ($err || $status<200 || $status>=300 || !is_array($data) || empty($data['access_token'])) throw new RuntimeException('Pembaruan token Google gagal. Periksa izin Drive dan konfigurasi OAuth.');
     $access=gdrive_encrypt((string)$data['access_token']); $expiry=date('Y-m-d H:i:s',time()+max(60,(int)($data['expires_in']??3600)-60));
-    $pdo->prepare('UPDATE google_drive_connections SET access_token_enc=?,access_token_expires_at=? WHERE user_id=?')->execute([$access,$expiry,$userId]);
+    $pdo->prepare('UPDATE google_drive_connections SET access_token_enc=?,access_token_expires_at=?,token_expires_at=? WHERE user_id=?')->execute([$access,$expiry,$expiry,$userId]);
     return (string)$data['access_token'];
 }
 function gdrive_api(int $userId, string $method, string $url, ?array $json=null, ?string $uploadPath=null, ?string $mime=null) {
