@@ -27,3 +27,8 @@ absensi_sd/assets/images/ttd_guru/
 # Server/runtime
 .DS_Store
 Thumbs.db
+
+# Google Drive / database secrets — never commit real server config
+config/google_drive.php
+config/database.php
+config/config.local.php
