@@ -6,11 +6,12 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/self-healing
     - /bin/cp self-healing/logger.php $DEPLOYPATH/self-healing/
     - /bin/cp self-healing/patch_engine.php $DEPLOYPATH/self-healing/
-    # Optional Google Drive patch: copy each file only if it exists in the checked-out repository.
+    # Deploy Google Drive endpoints only when tracked in the repository.
     - if [ -f gdrive/connect.php ]; then /bin/mkdir -p $DEPLOYPATH/gdrive && /bin/cp gdrive/connect.php $DEPLOYPATH/gdrive/; fi
     - if [ -f gdrive/callback.php ]; then /bin/mkdir -p $DEPLOYPATH/gdrive && /bin/cp gdrive/callback.php $DEPLOYPATH/gdrive/; fi
+    # Keep server-only config/google_drive.php and config/database.php untouched.
+    - if [ -f config/google_drive_lib.php ]; then /bin/mkdir -p $DEPLOYPATH/config && /bin/cp config/google_drive_lib.php $DEPLOYPATH/config/; fi
     - if [ -f storage/index.php ]; then /bin/mkdir -p $DEPLOYPATH/storage && /bin/cp storage/index.php $DEPLOYPATH/storage/; fi
-    - if [ -f storage/upload.php ]; then /bin/cp storage/upload.php $DEPLOYPATH/storage/; fi
-    - if [ -f storage/delete.php ]; then /bin/cp storage/delete.php $DEPLOYPATH/storage/; fi
-    - if [ -f storage/download.php ]; then /bin/cp storage/download.php $DEPLOYPATH/storage/; fi
-    - if [ -f config/google_drive_lib.php ]; then /bin/cp config/google_drive_lib.php $DEPLOYPATH/config/; fi
+    - if [ -f storage/upload.php ]; then /bin/mkdir -p $DEPLOYPATH/storage && /bin/cp storage/upload.php $DEPLOYPATH/storage/; fi
+    - if [ -f storage/delete.php ]; then /bin/mkdir -p $DEPLOYPATH/storage && /bin/cp storage/delete.php $DEPLOYPATH/storage/; fi
+    - if [ -f storage/download.php ]; then /bin/mkdir -p $DEPLOYPATH/storage && /bin/cp storage/download.php $DEPLOYPATH/storage/; fi
