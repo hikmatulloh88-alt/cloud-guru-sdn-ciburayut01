@@ -76,6 +76,9 @@ try {
         throw new RuntimeException('Google menolak pertukaran token (HTTP ' . $httpCode . '). ' . substr($googleError, 0, 240) . ' Periksa Client ID dan redirect URI di konfigurasi server.');
     }
 
+    // Ensure the live database schema is migrated before token persistence.
+    // This repairs older installs missing token expiry columns before INSERT/UPDATE.
+    gdrive_require_tables();
     gdrive_store_tokens($userId, $tokens);
     $about = gdrive_about($userId);
     $googleEmail = (string)($about['user']['emailAddress'] ?? '');
