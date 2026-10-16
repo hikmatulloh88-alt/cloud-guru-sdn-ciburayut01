@@ -166,22 +166,13 @@ function gdrive_ensure_structure(int $userId): void {
         'perencanaan_folder_id' => 'VARCHAR(255) DEFAULT NULL',
         'asesmen_folder_id' => 'VARCHAR(255) DEFAULT NULL',
     ] as $column => $definition) {
-        // MariaDB does not reliably accept bound placeholders in SHOW COLUMNS.
-        // $column comes only from the fixed allowlist above, so quote it as a SQL string literal.
-        $checkSql = "SHOW COLUMNS FROM google_drive_connections LIKE " . $pdo->quote($column);
-        $check = $pdo->query($checkSql);
-        if (!$check->fetch(PDO::FETCH_ASSOC)) {
-            try {
-                $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$column` $definition");
-            } catch (PDOException $e) {
-                $check = $pdo->query($checkSql);
-                if (!$check->fetch(PDO::FETCH_ASSOC)) {
-                    throw new RuntimeException(
-                        "Database Cloud Guru belum memiliki kolom $column dan migrasi otomatis gagal. Periksa izin ALTER pada user database.",
-                        0,
-                        $e
-                    );
-                }
+        // Exact column-name comparison avoids LIKE treating underscores as wildcards.
+        $columns = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array($column, $columns, true)) {
+            $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN IF NOT EXISTS `$column` $definition");
+            $columns = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array($column, $columns, true)) {
+                throw new RuntimeException("Kolom database $column belum tersedia setelah perbaikan otomatis. Periksa izin ALTER TABLE pada user database.");
             }
         }
     }
