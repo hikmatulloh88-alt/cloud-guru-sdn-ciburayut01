@@ -582,6 +582,8 @@ body{background:#f5f8fb!important;color:#102a43}
   .published-header .ph-menu-wrap{display:block!important;position:static!important;flex:0 0 42px!important;z-index:12000!important}
   .published-header .ph-menu-wrap>summary.ph-menu{display:grid!important;place-items:center!important;position:relative!important;z-index:12002!important;touch-action:manipulation!important;cursor:pointer!important}
   .published-header .ph-menu-wrap>.ph-nav{position:fixed!important;top:76px!important;left:12px!important;right:12px!important;width:auto!important;max-height:calc(100dvh - 92px)!important;overflow-y:auto!important;z-index:12001!important;background:#fff!important;color:#102a43!important;border:1px solid #dbe4ee!important;border-radius:16px!important;padding:12px!important;box-shadow:0 18px 50px rgba(15,23,42,.28)!important;flex-direction:column!important;align-items:stretch!important}
+  .published-header .ph-menu-wrap:not([open])>.ph-nav{display:none!important;visibility:hidden!important;pointer-events:none!important}
+  .published-header .ph-menu-wrap[open]>.ph-nav{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
   .published-header .ph-menu-wrap>.ph-nav a{display:block!important;color:#334e68!important;text-align:center!important;padding:13px!important;font-size:15px!important}
   .published-header .ph-menu-wrap>.ph-nav a.ph-cta{color:#fff!important;margin:4px 0 0!important}
 }
@@ -594,41 +596,24 @@ body{background:#f5f8fb!important;color:#102a43}
 <script id="public-menu-responsive-init">
 (function(){
   function initPublicMenu(){
-    var menu=document.querySelector('.ph-menu-wrap');
+    var menu=document.querySelector('.published-header details.ph-menu-wrap');
     if(!menu) return;
     var trigger=menu.querySelector('summary.ph-menu');
-    var nav=menu.querySelector('.ph-nav');
-    if(!trigger || !nav) return;
-    function setOpen(open){
-      menu.open=!!open;
-      if(window.matchMedia('(max-width: 760px)').matches){
-        nav.style.setProperty('display', open ? 'flex' : 'none', 'important');
-        nav.style.setProperty('visibility', open ? 'visible' : 'hidden', 'important');
-        nav.style.setProperty('opacity', open ? '1' : '0', 'important');
-        nav.style.setProperty('pointer-events', open ? 'auto' : 'none', 'important');
-      }else{
-        nav.style.removeProperty('display');
-        nav.style.removeProperty('visibility');
-        nav.style.removeProperty('opacity');
-        nav.style.removeProperty('pointer-events');
-      }
-      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-    trigger.addEventListener('click',function(event){
-      if(window.matchMedia('(max-width: 760px)').matches){
-        event.preventDefault();
-        event.stopPropagation();
-        setOpen(!menu.open);
-      }
-    },true);
-    menu.querySelectorAll('.ph-nav a').forEach(function(link){
-      link.addEventListener('click',function(){ setOpen(false); });
+    if(!trigger) return;
+    trigger.setAttribute('aria-expanded',menu.open?'true':'false');
+    menu.addEventListener('toggle',function(){
+      trigger.setAttribute('aria-expanded',menu.open?'true':'false');
     });
-    if(window.matchMedia('(min-width: 761px)').matches) setOpen(true);
-    else setOpen(false);
+    menu.querySelectorAll('.ph-nav a').forEach(function(link){
+      link.addEventListener('click',function(){
+        if(window.matchMedia('(max-width: 760px)').matches) menu.open=false;
+      });
+    });
+    document.addEventListener('click',function(event){
+      if(menu.open && window.matchMedia('(max-width: 760px)').matches && !menu.contains(event.target)) menu.open=false;
+    });
     window.addEventListener('resize',function(){
-      if(window.matchMedia('(min-width: 761px)').matches) setOpen(true);
-      else setOpen(false);
+      if(window.matchMedia('(min-width: 761px)').matches) menu.open=false;
     },{passive:true});
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initPublicMenu,{once:true});
