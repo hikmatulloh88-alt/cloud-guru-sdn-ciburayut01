@@ -15,7 +15,7 @@ try{$q=$pdo->query("SELECT setting_key,setting_value FROM website_builder_settin
 $defaultQuickLinks="Beranda|/?page=home\nProfil Sekolah|/?page=profil\nInformasi|/?page=informasi\nProfil Guru|/?page=guru\nGaleri|/?page=galeri";
 if(trim((string)($settings['footer_quicklinks']??''))==='')$settings['footer_quicklinks']=$defaultQuickLinks;
 if(trim((string)($settings['footer_text']??''))==='')$settings['footer_text']='© '.date('Y').' SDN Ciburayut 01. Semua hak dilindungi.';
-$navbar=['navbar_enabled'=>true,'navbar_items'=>[['label'=>'Beranda','url'=>'/?page=home'],['label'=>'Profil','url'=>'/?page=profil'],['label'=>'Informasi','url'=>'/?page=informasi'],['label'=>'Guru','url'=>'/?page=guru'],['label'=>'Galeri','url'=>'/?page=galeri']],'navbar_cta_text'=>'🔐 Masuk Sistem','navbar_cta_url'=>'/auth/login.php','navbar_style'=>'glass'];
+$navbar=['navbar_enabled'=>true,'navbar_items'=>[['label'=>'Beranda','url'=>'/?page=home'],['label'=>'Profil','url'=>'/?page=profil'],['label'=>'Informasi','url'=>'/?page=informasi'],['label'=>'Guru','url'=>'/?page=guru'],['label'=>'Galeri','url'=>'/?page=galeri']],'navbar_cta_text'=>'☁️ Masuk Cloud Guru','navbar_cta_url'=>'/auth/login.php','navbar_style'=>'glass'];
 try{$q=$pdo->query("SELECT setting_key,setting_value FROM website_builder_settings WHERE setting_key LIKE 'navbar_%'");foreach($q as $r)if(array_key_exists($r['setting_key'],$navbar))$navbar[$r['setting_key']]=in_array($r['setting_key'],['navbar_items'])?(json_decode($r['setting_value'],true)?:$navbar[$r['setting_key']]):$r['setting_value'];}catch(Throwable $e){}
 $navbar['navbar_enabled']=$navbar['navbar_enabled']==='1'||$navbar['navbar_enabled']===true;
 // Final public navigation guard: never render dead # links.
