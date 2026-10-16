@@ -6,6 +6,24 @@ require_once __DIR__.'/../config/google_drive_lib.php';
 if($_SERVER['REQUEST_METHOD']!=='POST'){header('Location: /storage/index.php');exit;}
 try{
  $uid=gdrive_user_id(); if($uid<1)throw new RuntimeException('Akun tidak terbaca. Login ulang.');
+ // Repair the live table before calling shared Drive helpers; do not rely on stale migration state.
+ $pdo->exec("CREATE TABLE IF NOT EXISTS google_drive_connections (
+   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   user_id BIGINT UNSIGNED NOT NULL UNIQUE,
+   google_email VARCHAR(255) DEFAULT NULL,
+   google_name VARCHAR(255) DEFAULT NULL,
+   refresh_token_enc MEDIUMTEXT DEFAULT NULL,
+   access_token_enc MEDIUMTEXT DEFAULT NULL,
+   access_token_expires_at DATETIME DEFAULT NULL,
+   token_expires_at DATETIME DEFAULT NULL,
+   root_folder_id VARCHAR(255) DEFAULT NULL,
+   administrasi_folder_id VARCHAR(255) DEFAULT NULL,
+   perencanaan_folder_id VARCHAR(255) DEFAULT NULL,
+   asesmen_folder_id VARCHAR(255) DEFAULT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   INDEX idx_gdrive_user (user_id)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
  gdrive_require_tables();
  // Last-resort schema repair before folder setup or upload touches folder columns.
  $requiredFolderColumns = [
