@@ -6,7 +6,21 @@ require_once __DIR__.'/../config/google_drive_lib.php';
 if($_SERVER['REQUEST_METHOD']!=='POST'){header('Location: /storage/index.php');exit;}
 try{
  $uid=gdrive_user_id(); if($uid<1)throw new RuntimeException('Akun tidak terbaca. Login ulang.');
- gdrive_require_tables(); gdrive_ensure_structure($uid);
+ gdrive_require_tables();
+ // Last-resort schema repair before folder setup or upload touches folder columns.
+ $requiredFolderColumns = [
+   'root_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+   'administrasi_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+   'perencanaan_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+   'asesmen_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+ ];
+ $actualColumns = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+ foreach ($requiredFolderColumns as $column => $definition) {
+   if (!in_array($column, $actualColumns, true)) {
+     $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$column` $definition");
+   }
+ }
+ gdrive_ensure_structure($uid);
  $folderKey=(string)($_POST['folder']??'root_folder_id');
  $allowed=['root_folder_id','administrasi_folder_id','perencanaan_folder_id','asesmen_folder_id'];
  if(!in_array($folderKey,$allowed,true))$folderKey='root_folder_id';
