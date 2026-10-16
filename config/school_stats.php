@@ -65,12 +65,24 @@ if (!function_exists('school_stats_photo_count')) {
 }
 if (!function_exists('renderSchoolStats')) {
  function renderSchoolStats(PDO $pdo): string {
-  $studentsTable=school_stats_find_table($pdo,['siswa','students','peserta_didik','data_siswa','student'],['siswa','student','peserta_didik']);
-  $teachersTable=school_stats_find_table($pdo,['guru','teachers','data_guru','teacher','profil_guru'],['guru','teacher','pendidik']);
-  $students=school_stats_count_table($pdo,$studentsTable,true);
-  $teachers=school_stats_count_table($pdo,$teachersTable,true);
+  // Sumber utama tetap aplikasi Absensi bila konfigurasi server tersedia.
+  $statsPdo = $pdo;
+  if (defined('ABSENSI_DB_HOST') && defined('ABSENSI_DB_NAME') && defined('ABSENSI_DB_USER')) {
+   try {
+    $statsPdo = new PDO(
+     'mysql:host=' . ABSENSI_DB_HOST . ';dbname=' . ABSENSI_DB_NAME . ';charset=utf8mb4',
+     ABSENSI_DB_USER,
+     defined('ABSENSI_DB_PASS') ? ABSENSI_DB_PASS : '',
+     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+    );
+   } catch (Throwable $e) { $statsPdo = $pdo; }
+  }
+  $studentsTable=school_stats_find_table($statsPdo,['siswa','students','peserta_didik','data_siswa','student'],['siswa','student','peserta_didik']);
+  $teachersTable=school_stats_find_table($statsPdo,['guru','teachers','data_guru','teacher','profil_guru'],['guru','teacher','pendidik']);
+  $students=school_stats_count_table($statsPdo,$studentsTable,true);
+  $teachers=school_stats_count_table($statsPdo,$teachersTable,true);
   $profiles=school_stats_count_table($pdo,$teachersTable,true);
-  $photos=school_stats_photo_count($pdo,$teachersTable);
+  $photos=school_stats_photo_count($statsPdo,$teachersTable);
   $items=[['👨‍🎓',$students,'Siswa Aktif','student'],['👩‍🏫',$teachers,'Guru & Tenaga Pendidik','teacher'],['📋',$profiles,'Profil Guru','profile'],['📸',$photos,'Guru dengan Foto','photo']];
   $html='<section class="school-live-stats"><div class="school-live-stats-head"><span class="eyebrow">DATA SEKOLAH TERKINI</span><h2>SDN Ciburayut 01</h2><p>Ringkasan data sekolah yang tersedia pada sistem.</p></div><div class="school-live-stats-grid">';
   foreach($items as [$icon,$value,$label,$class]) $html.='<article class="school-live-stat '.htmlspecialchars($class,ENT_QUOTES,'UTF-8').'"><span class="school-live-icon">'.$icon.'</span><strong>'.number_format((int)$value,0,',','.').'</strong><small>'.htmlspecialchars($label,ENT_QUOTES,'UTF-8').'</small></article>';
