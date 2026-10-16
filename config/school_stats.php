@@ -12,9 +12,9 @@ if (!function_exists('school_stats_table_exists')) {
 if (!function_exists('school_stats_count')) {
  function school_stats_count(PDO $pdo, array $tables, array $activeColumns=[]): int {
   foreach ($tables as $table) {
-   if (!school_stats_table_exists($pdo,$table)) continue;
+   if (!school_stats_table_exists($statsPdo,$table)) continue;
    try {
-    $cols=$pdo->query('SHOW COLUMNS FROM `'.$table.'`')->fetchAll(PDO::FETCH_COLUMN);
+    $cols=$statsPdo->query('SHOW COLUMNS FROM `'.$table.'`')->fetchAll(PDO::FETCH_COLUMN);
     $where='';
     foreach ($activeColumns as $col) if (in_array($col,$cols,true)) { $where=' WHERE `'.$col.'` IN (1, "1", "Aktif", "aktif", "active", "Active")'; break; }
     return max(0,(int)$pdo->query('SELECT COUNT(*) FROM `'.$table.'`'.$where)->fetchColumn());
@@ -25,9 +25,22 @@ if (!function_exists('school_stats_count')) {
 }
 if (!function_exists('renderSchoolStats')) {
  function renderSchoolStats(PDO $pdo): string {
-  $students=school_stats_count($pdo,['siswa','students','peserta_didik','data_siswa','student'],['status','is_active','aktif']);
-  $teachers=school_stats_count($pdo,['guru','teachers','data_guru','teacher'],['status','is_active','aktif']);
-  $profiles=school_stats_count($pdo,['teachers','guru','profil_guru','data_guru'],['is_active','status','aktif']);
+  // Gunakan database Absensi sebagai sumber utama bila kredensial server disediakan.
+  $statsPdo = $pdo;
+  if (defined('ABSENSI_DB_HOST') && defined('ABSENSI_DB_NAME') && defined('ABSENSI_DB_USER')) {
+   try {
+    $candidate = new PDO(
+     'mysql:host=' . ABSENSI_DB_HOST . ';dbname=' . ABSENSI_DB_NAME . ';charset=utf8mb4',
+     ABSENSI_DB_USER,
+     defined('ABSENSI_DB_PASS') ? ABSENSI_DB_PASS : '',
+     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+    );
+    $statsPdo = $candidate;
+   } catch (Throwable $e) { /* gunakan database portal sebagai fallback */ }
+  }
+  $students=school_stats_count($statsPdo,['siswa','students','peserta_didik','data_siswa','student'],['status','is_active','aktif']);
+  $teachers=school_stats_count($statsPdo,['guru','teachers','data_guru','teacher'],['status','is_active','aktif']);
+  $profiles=school_stats_count($statsPdo,['teachers','guru','profil_guru','data_guru'],['is_active','status','aktif']);
   $photos=0;
   foreach (['teachers','guru','profil_guru','data_guru'] as $table) {
    if (!school_stats_table_exists($pdo,$table)) continue;
@@ -36,7 +49,7 @@ if (!function_exists('renderSchoolStats')) {
     $photoCol=null;
     foreach (['foto','photo','photo_url','foto_guru','gambar'] as $col) if (in_array($col,$cols,true)) { $photoCol=$col; break; }
     if ($photoCol===null) continue;
-    $photos=(int)$pdo->query('SELECT COUNT(*) FROM `'.$table.'` WHERE `'.$photoCol.'` IS NOT NULL AND TRIM(`'.$photoCol.'`) <> ""')->fetchColumn();
+    $photos=(int)$statsPdo->query('SELECT COUNT(*) FROM `'.$table.'` WHERE `'.$photoCol.'` IS NOT NULL AND TRIM(`'.$photoCol.'`) <> ""')->fetchColumn();
     break;
    } catch (Throwable $e) { continue; }
   }
