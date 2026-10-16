@@ -158,16 +158,29 @@ function gdrive_about(int $userId): array {
 function gdrive_ensure_structure(int $userId): void {
     global $pdo;
     gdrive_require_tables();
-    // Defensive repair for databases created by older releases.
-    $existing = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+    // Force schema verification immediately before any folder UPDATE. This handles
+    // older databases and refreshes metadata after every DDL operation.
     foreach ([
         'root_folder_id' => 'VARCHAR(255) DEFAULT NULL',
         'administrasi_folder_id' => 'VARCHAR(255) DEFAULT NULL',
         'perencanaan_folder_id' => 'VARCHAR(255) DEFAULT NULL',
         'asesmen_folder_id' => 'VARCHAR(255) DEFAULT NULL',
     ] as $column => $definition) {
-        if (!in_array($column, $existing, true)) {
-            $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$column` $definition");
+        $check = $pdo->prepare("SHOW COLUMNS FROM google_drive_connections LIKE ?");
+        $check->execute([$column]);
+        if (!$check->fetch(PDO::FETCH_ASSOC)) {
+            try {
+                $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$column` $definition");
+            } catch (PDOException $e) {
+                $check->execute([$column]);
+                if (!$check->fetch(PDO::FETCH_ASSOC)) {
+                    throw new RuntimeException(
+                        "Database Cloud Guru belum memiliki kolom $column dan migrasi otomatis gagal. Periksa izin ALTER pada user database.",
+                        0,
+                        $e
+                    );
+                }
+            }
         }
     }
     $s=$pdo->prepare('SELECT * FROM google_drive_connections WHERE user_id=?'); $s->execute([$userId]); $row=$s->fetch(PDO::FETCH_ASSOC);
