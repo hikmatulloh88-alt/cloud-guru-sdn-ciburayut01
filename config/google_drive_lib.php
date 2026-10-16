@@ -65,7 +65,8 @@ function gdrive_require_tables(): void {
     if (!in_array('token_expires_at', $columns, true)) {
         $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN token_expires_at DATETIME DEFAULT NULL");
     }
-    // Older installations may predate the folder columns; add them before any UPDATE uses them.
+    // Repair older live schemas. Refresh SHOW COLUMNS after each ALTER and tolerate
+    // concurrent requests that may add the same column at the same time.
     $folderColumns = [
         'root_folder_id' => 'VARCHAR(255) DEFAULT NULL',
         'administrasi_folder_id' => 'VARCHAR(255) DEFAULT NULL',
@@ -73,8 +74,16 @@ function gdrive_require_tables(): void {
         'asesmen_folder_id' => 'VARCHAR(255) DEFAULT NULL',
     ];
     foreach ($folderColumns as $column => $definition) {
-        if (!in_array($column, $columns, true)) {
-            $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$column` $definition");
+        $currentColumns = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array($column, $currentColumns, true)) {
+            try {
+                $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$column` $definition");
+            } catch (PDOException $migrationError) {
+                $verifiedColumns = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+                if (!in_array($column, $verifiedColumns, true)) {
+                    throw $migrationError;
+                }
+            }
         }
     }
     $pdo->exec("UPDATE google_drive_connections SET access_token_expires_at=COALESCE(access_token_expires_at,token_expires_at), token_expires_at=COALESCE(token_expires_at,access_token_expires_at)");
