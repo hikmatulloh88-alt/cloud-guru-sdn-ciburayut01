@@ -149,6 +149,18 @@ function gdrive_about(int $userId): array {
 function gdrive_ensure_structure(int $userId): void {
     global $pdo;
     gdrive_require_tables();
+    // Defensive repair for databases created by older releases.
+    $existing = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+    foreach ([
+        'root_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+        'administrasi_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+        'perencanaan_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+        'asesmen_folder_id' => 'VARCHAR(255) DEFAULT NULL',
+    ] as $column => $definition) {
+        if (!in_array($column, $existing, true)) {
+            $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$column` $definition");
+        }
+    }
     $s=$pdo->prepare('SELECT * FROM google_drive_connections WHERE user_id=?'); $s->execute([$userId]); $row=$s->fetch(PDO::FETCH_ASSOC);
     if (!$row) return;
     $root=$row['root_folder_id'] ?? null;
