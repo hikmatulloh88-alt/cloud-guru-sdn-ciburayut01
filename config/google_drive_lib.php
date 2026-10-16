@@ -166,13 +166,15 @@ function gdrive_ensure_structure(int $userId): void {
         'perencanaan_folder_id' => 'VARCHAR(255) DEFAULT NULL',
         'asesmen_folder_id' => 'VARCHAR(255) DEFAULT NULL',
     ] as $column => $definition) {
-        $check = $pdo->prepare("SHOW COLUMNS FROM google_drive_connections LIKE ?");
-        $check->execute([$column]);
+        // MariaDB does not reliably accept bound placeholders in SHOW COLUMNS.
+        // $column comes only from the fixed allowlist above, so quote it as a SQL string literal.
+        $checkSql = "SHOW COLUMNS FROM google_drive_connections LIKE " . $pdo->quote($column);
+        $check = $pdo->query($checkSql);
         if (!$check->fetch(PDO::FETCH_ASSOC)) {
             try {
                 $pdo->exec("ALTER TABLE google_drive_connections ADD COLUMN `$column` $definition");
             } catch (PDOException $e) {
-                $check->execute([$column]);
+                $check = $pdo->query($checkSql);
                 if (!$check->fetch(PDO::FETCH_ASSOC)) {
                     throw new RuntimeException(
                         "Database Cloud Guru belum memiliki kolom $column dan migrasi otomatis gagal. Periksa izin ALTER pada user database.",
