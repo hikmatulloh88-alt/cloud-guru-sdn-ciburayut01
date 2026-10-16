@@ -76,10 +76,25 @@ function gdrive_store_tokens(int $userId, array $tokens): void {
     $old = $stmt->fetch(PDO::FETCH_ASSOC);
     $refresh = !empty($tokens['refresh_token']) ? gdrive_encrypt((string)$tokens['refresh_token']) : ($old['refresh_token_enc'] ?? null);
     if (!$refresh) throw new RuntimeException('Google tidak mengirim refresh token. Cabut akses aplikasi dari akun Google lalu hubungkan ulang.');
+    if (empty($tokens['access_token'])) throw new RuntimeException('Google tidak mengirim access token.');
     $access = gdrive_encrypt((string)$tokens['access_token']);
-    $stmt = $pdo->prepare("INSERT INTO google_drive_connections (user_id,refresh_token_enc,access_token_enc,access_token_expires_at,token_expires_at)
-      VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE refresh_token_enc=VALUES(refresh_token_enc),access_token_enc=VALUES(access_token_enc),access_token_expires_at=VALUES(access_token_expires_at),token_expires_at=VALUES(token_expires_at)");
-    $stmt->execute([$userId,$refresh,$access,$expires,$expires]);
+
+    // Detect the real server schema; older deployments may have only one expiry column.
+    $columns = $pdo->query("SHOW COLUMNS FROM google_drive_connections")->fetchAll(PDO::FETCH_COLUMN);
+    $values = [
+        'user_id' => $userId,
+        'refresh_token_enc' => $refresh,
+        'access_token_enc' => $access,
+    ];
+    if (in_array('access_token_expires_at', $columns, true)) $values['access_token_expires_at'] = $expires;
+    if (in_array('token_expires_at', $columns, true)) $values['token_expires_at'] = $expires;
+    $names = array_keys($values);
+    $quoted = implode(',', array_map(static fn($name) => '`'.$name.'`', $names));
+    $marks = implode(',', array_fill(0, count($names), '?'));
+    $updates = [];
+    foreach (array_slice($names, 1) as $name) $updates[] = '`'.$name.'`=VALUES(`'.$name.'`)';
+    $sql = 'INSERT INTO google_drive_connections ('.$quoted.') VALUES ('.$marks.') ON DUPLICATE KEY UPDATE '.implode(',', $updates);
+    $pdo->prepare($sql)->execute(array_values($values));
 }
 function gdrive_access_token(int $userId): string {
     global $pdo;
