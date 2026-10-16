@@ -10,6 +10,8 @@ deployment:
     - /bin/cp gdrive/callback.php $DEPLOYPATH/gdrive/
     - /bin/mkdir -p $DEPLOYPATH/config
     - /bin/cp config/google_drive_lib.php $DEPLOYPATH/config/
+    - /bin/cp config/google_drive_lib.php $DEPLOYPATH/config/google_drive_lib.php
+    - /bin/chmod 644 $DEPLOYPATH/config/google_drive_lib.php
     - /bin/cp config/school_stats.php $DEPLOYPATH/config/
     - /bin/cp index.php $DEPLOYPATH/index.php
     - /bin/mkdir -p $DEPLOYPATH/storage
