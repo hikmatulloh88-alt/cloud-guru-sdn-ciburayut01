@@ -613,13 +613,6 @@ body{background:#f5f8fb!important;color:#102a43}
     if(!menu) return;
     var trigger=menu.querySelector('summary.ph-menu');
     if(!trigger) return;
-    trigger.addEventListener('click',function(event){
-      if(window.matchMedia('(max-width: 760px)').matches){
-        event.preventDefault();
-        menu.open=!menu.open;
-        trigger.setAttribute('aria-expanded',menu.open?'true':'false');
-      }
-    });
     trigger.setAttribute('aria-expanded',menu.open?'true':'false');
     menu.addEventListener('toggle',function(){
       trigger.setAttribute('aria-expanded',menu.open?'true':'false');
