@@ -74,9 +74,22 @@ function renderPublicTeachers($pdo){
    */
   $rows = [];
   $absensi = null;
+
+  /*
+   * Jangan memakai placeholder DB_HOST/DB_USER sebagai kredensial literal.
+   * Kredensial Absensi hanya boleh berasal dari konfigurasi server yang tidak
+   * disimpan di Git. Jika konstanta belum disediakan, gunakan fallback PDO.
+   */
+  $dbHost = defined('ABSENSI_DB_HOST') ? ABSENSI_DB_HOST : (defined('DB_HOST') ? DB_HOST : null);
+  $dbUser = defined('ABSENSI_DB_USER') ? ABSENSI_DB_USER : (defined('DB_USER') ? DB_USER : null);
+  $dbPass = defined('ABSENSI_DB_PASS') ? ABSENSI_DB_PASS : (defined('DB_PASS') ? DB_PASS : null);
+  $dbName = defined('ABSENSI_DB_NAME') ? ABSENSI_DB_NAME : (defined('DB_NAME') ? DB_NAME : null);
+
   try {
-    $absensi = new mysqli('DB_HOST', 'DB_USER', 'DB_PASS', 'DB_NAME');
-    if (!$absensi->connect_errno) {
+    if ($dbHost && $dbUser && $dbName) {
+      $absensi = new mysqli($dbHost, $dbUser, (string)($dbPass ?? ''), $dbName);
+    }
+    if ($absensi instanceof mysqli && !$absensi->connect_errno) {
       $absensi->set_charset('utf8mb4');
       $sql = "SELECT id_guru,nama,nip,nuptk,jabatan,jenis_ptk,foto,no_hp
               FROM guru
