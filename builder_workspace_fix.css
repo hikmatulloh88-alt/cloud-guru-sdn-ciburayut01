@@ -1,45 +1,31 @@
-/* Hard override: builder two-column workspace */
-body .builder .builder-body{
- display:grid!important;
- grid-template-columns:minmax(0,1fr) 330px!important;
- grid-template-rows:minmax(0,1fr)!important;
- align-items:stretch!important;
- height:calc(100vh - 48px)!important;
- min-height:0!important;
- width:100%!important;
- overflow:hidden!important;
+/* Builder layout hotfix: explicit two-pane flex/grid, selectors intentionally broad */
+html,body{margin:0!important;width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+body .builder-body{
+ display:grid!important;grid-template-columns:minmax(0,1fr) 330px!important;
+ grid-template-rows:minmax(0,1fr)!important;gap:0!important;
+ width:100%!important;height:calc(100vh - 48px)!important;min-height:0!important;
+ overflow:hidden!important;flex:1 1 auto!important;position:relative!important;
 }
-body .builder .builder-body > main.canvas-wrap{
+body .builder-body .canvas-wrap{
  display:block!important;grid-column:1!important;grid-row:1!important;
- position:relative!important;float:none!important;flex:none!important;
- width:auto!important;min-width:0!important;max-width:none!important;
- height:100%!important;min-height:0!important;overflow:auto!important;
- box-sizing:border-box!important;
+ position:relative!important;inset:auto!important;float:none!important;transform:none!important;
+ width:auto!important;min-width:0!important;max-width:none!important;height:100%!important;
+ min-height:0!important;overflow:auto!important;visibility:visible!important;
 }
-body .builder .builder-body > aside#sidePanel,
-body .builder .builder-body > .side-panel{
- display:flex!important;grid-column:2!important;grid-row:1!important;
- position:relative!important;float:none!important;inset:auto!important;
- transform:none!important;align-self:stretch!important;
+body .builder-body .side-panel,body .builder-body #sidePanel{
+ display:block!important;grid-column:2!important;grid-row:1!important;
+ position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
+ float:none!important;transform:none!important;margin:0!important;
  width:330px!important;min-width:330px!important;max-width:330px!important;
  height:100%!important;min-height:0!important;max-height:none!important;
- overflow-y:auto!important;overflow-x:hidden!important;box-sizing:border-box!important;
- flex-direction:column!important;
+ overflow-y:auto!important;overflow-x:hidden!important;visibility:visible!important;
+ background:#fff!important;z-index:5!important;box-sizing:border-box!important;
 }
-body .builder .builder-body > aside#sidePanel .panel-tabs{
- display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
- flex:0 0 auto!important;width:100%!important;position:sticky!important;top:0!important;
- background:#fff!important;z-index:10!important;
-}
-body .builder .builder-body > aside#sidePanel .panel-content{
- display:block!important;position:relative!important;width:100%!important;
- min-width:0!important;overflow:visible!important;flex:1 0 auto!important;
- box-sizing:border-box!important;
-}
-body .builder .builder-body > aside#sidePanel .tab{min-width:0!important;white-space:normal!important;padding:10px 3px!important;font-size:9px!important}
-body .builder .builder-body .responsive-stage{width:100%!important;min-width:0!important;max-width:100%!important}
+body .builder-body .panel-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important;position:sticky!important;top:0!important;background:#fff!important;z-index:10!important}
+body .builder-body .panel-content{display:block!important;width:100%!important;min-width:0!important;overflow:visible!important;box-sizing:border-box!important}
+body .builder-body .responsive-stage{width:100%!important;min-width:0!important;max-width:100%!important}
 @media(max-width:760px){
- body .builder .builder-body{display:flex!important;flex-direction:column!important;height:auto!important;overflow:visible!important}
- body .builder .builder-body > main.canvas-wrap{width:100%!important;height:auto!important;min-height:45vh!important}
- body .builder .builder-body > aside#sidePanel,body .builder .builder-body > .side-panel{width:100%!important;min-width:0!important;max-width:none!important;height:auto!important;overflow:visible!important}
+ body .builder-body{display:flex!important;flex-direction:column!important;height:auto!important;overflow:visible!important}
+ body .builder-body .canvas-wrap{width:100%!important;height:auto!important;min-height:45vh!important}
+ body .builder-body .side-panel,body .builder-body #sidePanel{position:relative!important;width:100%!important;min-width:0!important;max-width:none!important;height:auto!important;overflow:visible!important}
 }
