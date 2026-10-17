@@ -24,5 +24,9 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/builder/assets
     - /bin/cp .deploy_builder_restore/public_html/builder/index.php $DEPLOYPATH/builder/index.php
     - /bin/cp .deploy_builder_restore/public_html/builder/assets/builder.css $DEPLOYPATH/builder/assets/builder.css
+    - /bin/cp $DEPLOYPATH/builder/assets/builder.css .deploy_builder_base.css
+    - /bin/cat builder_workspace_fix.css >> .deploy_builder_base.css
+    - /bin/cp .deploy_builder_base.css $DEPLOYPATH/builder/assets/builder.css
+    - /bin/rm -f .deploy_builder_base.css
     - /bin/cp .deploy_builder_restore/public_html/builder/assets/menu_fix.js $DEPLOYPATH/builder/assets/menu_fix.js
     - /bin/rm -rf .deploy_builder_restore
