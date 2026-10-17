@@ -1,31 +1,36 @@
-/* Builder layout hotfix: explicit two-pane flex/grid, selectors intentionally broad */
+/* Builder responsive breakpoint correction: keep split workspace on normal desktop windows */
 html,body{margin:0!important;width:100%!important;max-width:100%!important;overflow-x:hidden!important}
-body .builder-body{
- display:grid!important;grid-template-columns:minmax(0,1fr) 330px!important;
- grid-template-rows:minmax(0,1fr)!important;gap:0!important;
- width:100%!important;height:calc(100vh - 48px)!important;min-height:0!important;
- overflow:hidden!important;flex:1 1 auto!important;position:relative!important;
+@media (min-width:601px){
+ body .builder{height:100vh!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+ body .builder-body{
+  display:grid!important;grid-template-columns:minmax(0,1fr) 310px!important;
+  grid-template-rows:minmax(0,1fr)!important;gap:0!important;
+  width:100%!important;height:calc(100vh - 64px)!important;min-height:0!important;
+  overflow:hidden!important;flex:1 1 auto!important;position:relative!important
+ }
+ body .builder-body .canvas-wrap{
+  display:block!important;grid-column:1!important;grid-row:1!important;
+  position:relative!important;inset:auto!important;float:none!important;transform:none!important;
+  width:auto!important;min-width:0!important;max-width:none!important;height:100%!important;
+  min-height:0!important;overflow:auto!important;visibility:visible!important
+ }
+ body .builder-body .side-panel,body .builder-body #sidePanel{
+  display:block!important;grid-column:2!important;grid-row:1!important;
+  position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
+  float:none!important;transform:none!important;margin:0!important;
+  width:310px!important;min-width:310px!important;max-width:310px!important;
+  height:100%!important;min-height:0!important;max-height:none!important;
+  overflow-y:auto!important;overflow-x:hidden!important;visibility:visible!important;
+  background:#fff!important;z-index:5!important;box-sizing:border-box!important
+ }
+ body .builder-body .panel-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important;position:sticky!important;top:0!important;background:#fff!important;z-index:10!important}
+ body .builder-body .panel-content{display:block!important;width:100%!important;min-width:0!important;overflow:visible!important;box-sizing:border-box!important}
+ body .builder-body .responsive-stage{width:100%!important;min-width:0!important;max-width:100%!important}
 }
-body .builder-body .canvas-wrap{
- display:block!important;grid-column:1!important;grid-row:1!important;
- position:relative!important;inset:auto!important;float:none!important;transform:none!important;
- width:auto!important;min-width:0!important;max-width:none!important;height:100%!important;
- min-height:0!important;overflow:auto!important;visibility:visible!important;
-}
-body .builder-body .side-panel,body .builder-body #sidePanel{
- display:block!important;grid-column:2!important;grid-row:1!important;
- position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
- float:none!important;transform:none!important;margin:0!important;
- width:330px!important;min-width:330px!important;max-width:330px!important;
- height:100%!important;min-height:0!important;max-height:none!important;
- overflow-y:auto!important;overflow-x:hidden!important;visibility:visible!important;
- background:#fff!important;z-index:5!important;box-sizing:border-box!important;
-}
-body .builder-body .panel-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important;position:sticky!important;top:0!important;background:#fff!important;z-index:10!important}
-body .builder-body .panel-content{display:block!important;width:100%!important;min-width:0!important;overflow:visible!important;box-sizing:border-box!important}
-body .builder-body .responsive-stage{width:100%!important;min-width:0!important;max-width:100%!important}
-@media(max-width:760px){
- body .builder-body{display:flex!important;flex-direction:column!important;height:auto!important;overflow:visible!important}
- body .builder-body .canvas-wrap{width:100%!important;height:auto!important;min-height:45vh!important}
- body .builder-body .side-panel,body .builder-body #sidePanel{position:relative!important;width:100%!important;min-width:0!important;max-width:none!important;height:auto!important;overflow:visible!important}
+@media(max-width:600px){
+ body .builder{height:100dvh!important;overflow:hidden!important}
+ body .builder-body{display:block!important;position:relative!important;height:calc(100dvh - 60px)!important;overflow:hidden!important}
+ body .builder-body .canvas-wrap{display:block!important;width:100%!important;height:100%!important;padding:16px 10px 40px!important}
+ body .builder-body .side-panel,body .builder-body #sidePanel{position:fixed!important;top:60px!important;right:-330px!important;left:auto!important;width:min(310px,88vw)!important;min-width:0!important;max-width:88vw!important;height:calc(100dvh - 60px)!important;z-index:120!important;transition:right .25s!important;overflow:auto!important}
+ body .builder-body .side-panel.open,body .builder-body #sidePanel.open{right:0!important}
 }
