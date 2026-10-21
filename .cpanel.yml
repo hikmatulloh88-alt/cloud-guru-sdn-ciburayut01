@@ -19,6 +19,8 @@ deployment:
     - /bin/cp storage/upload.php $DEPLOYPATH/storage/
     - /bin/cp storage/delete.php $DEPLOYPATH/storage/
     - /bin/cp storage/download.php $DEPLOYPATH/storage/
+    - /bin/mkdir -p $DEPLOYPATH/auth
+    - /bin/cp auth/login.php $DEPLOYPATH/auth/login.php
     - /bin/mkdir -p $DEPLOYPATH/ai-studio
     - /bin/cp ai-studio/index.php $DEPLOYPATH/ai-studio/index.php
     - /bin/cp ai-studio/generate.php $DEPLOYPATH/ai-studio/generate.php
