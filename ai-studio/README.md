@@ -23,4 +23,5 @@ Dokumentasi model: https://fal.ai/models/fal-ai/kling-video/v2.6/pro/image-to-vi
 - Halaman dan endpoint memakai session guard yang mengenali beberapa nama session umum. Karena source login/dashboard internal tidak terlihat di root repo, cocokkan guard dengan nama session yang benar pada instalasi Cloud Guru. Jangan publikasikan endpoint sebelum guard diverifikasi.
 - Endpoint memakai request sinkron, batas timeout hosting dapat membuat permintaan panjang gagal. Bila hosting membatasi waktu, implementasikan queue/status polling sesuai protokol fal.ai.
 - Tautan video yang dikembalikan berasal dari penyedia AI; atur penyimpanan/retensi sesuai kebutuhan sekolah.
+- Polling halaman menunggu maksimal sekitar 6 menit. Bila proses AI lebih lama, halaman berhenti menunggu; proses dapat tetap berjalan di penyedia AI.
 - Ini patch sumber awal, belum diuji di hosting, belum terhubung otomatis ke sidebar, dan bukan APK Android yang sudah dibangun.
