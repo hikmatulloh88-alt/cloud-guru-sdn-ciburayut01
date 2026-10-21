@@ -12,9 +12,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-require_once __DIR__ . '/../config/database.php'; // $pdo = DB Cloud Guru
-require_once __DIR__ . '/../absensi_sd/config/database.php'; // $koneksi = DB Absensi
-
 if (!empty($_SESSION['user_id'])) {
     header('Location: ' . ((isset($_GET['next']) && is_string($_GET['next']) && strpos($_GET['next'], '/') === 0 && strpos($_GET['next'], '//') !== 0 && strpos($_GET['next'], "\\") === false) ? $_GET['next'] : '../dashboard/index.php'));
     exit;
@@ -245,6 +242,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Username dan password wajib diisi.';
     } else {
         try {
+            // Muat koneksi hanya saat form dikirim agar halaman login tidak ikut 500 jika konfigurasi DB bermasalah.
+            require_once __DIR__ . '/../config/database.php'; // $pdo = DB Cloud Guru
+            require_once __DIR__ . '/../absensi_sd/config/database.php'; // $koneksi = DB Absensi
+
             // 1) Akun utama selalu diperiksa di database Absensi.
             $columns = [];
             $res = mysqli_query($koneksi, "SHOW COLUMNS FROM users");
@@ -276,8 +277,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$ok && $stored !== '' && hash_equals($stored, $password)) {
                     $ok = true;
                     $newHash = password_hash($password, PASSWORD_DEFAULT);
-                    $idCol = $columns['id_user'] ? 'id_user' : 'id';
-                    $up = mysqli_prepare($koneksi, "UPDATE users SET `$passCol`=? WHERE `$idCol`=? LIMIT 1");
+                    $idCol = isset($columns['id_user']) ? 'id_user' : (isset($columns['id']) ? 'id' : null);
+                    $up = $idCol !== null ? mysqli_prepare($koneksi, "UPDATE users SET `$passCol`=? WHERE `$idCol`=? LIMIT 1") : false;
                     if ($up) {
                         $uid=(int)$absUser[$idCol];
                         mysqli_stmt_bind_param($up,'si',$newHash,$uid);
