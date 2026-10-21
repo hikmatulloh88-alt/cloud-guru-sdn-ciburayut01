@@ -52,25 +52,28 @@ $payload = json_encode([
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 if ($payload === false) reply(500, ['error' => 'Gagal menyiapkan data foto.']);
 
-$ch = curl_init('https://fal.run/fal-ai/kling-video/v2.6/pro/image-to-video');
+$ch = curl_init('https://queue.fal.run/fal-ai/kling-video/v2.6/pro/image-to-video');
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_HTTPHEADER => ['Authorization: Key ' . $apiKey, 'Content-Type: application/json', 'Accept: application/json'],
     CURLOPT_POSTFIELDS => $payload,
-    CURLOPT_CONNECTTIMEOUT => 25,
-    CURLOPT_TIMEOUT => 300
+    CURLOPT_CONNECTTIMEOUT => 20,
+    CURLOPT_TIMEOUT => 45
 ]);
 $response = curl_exec($ch);
 $curlError = curl_error($ch);
 $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
-if ($response === false) reply(502, ['error' => 'Koneksi ke penyedia AI gagal: ' . $curlError]);
+if ($response === false) reply(502, ['error' => 'Koneksi ke antrean AI gagal: ' . $curlError]);
 $data = json_decode($response, true);
 if ($httpCode < 200 || $httpCode >= 300 || !is_array($data)) {
     $detail = is_array($data) ? (string)($data['detail'] ?? $data['error'] ?? 'Penyedia AI menolak permintaan.') : 'Respons penyedia AI tidak valid.';
     reply(502, ['error' => 'Layanan AI (' . $httpCode . '): ' . mb_substr($detail, 0, 350)]);
 }
-$videoUrl = $data['video']['url'] ?? '';
-if (!is_string($videoUrl) || !preg_match('~^https://~i', $videoUrl)) reply(502, ['error' => 'AI belum mengembalikan tautan video.']);
-reply(200, ['status' => 'completed', 'video_url' => $videoUrl, 'duration' => $duration]);
+$requestId = (string)($data['request_id'] ?? '');
+if ($requestId === '' || !preg_match('/^[a-zA-Z0-9-]{8,100}$/', $requestId)) {
+    reply(502, ['error' => 'Layanan AI tidak mengembalikan ID proses yang valid.']);
+}
+$_SESSION['ai_studio_request_id'] = $requestId;
+reply(202, ['status' => 'queued', 'request_id' => $requestId, 'message' => 'Video masuk antrean AI.']);
