@@ -323,7 +323,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Login - Cloud Guru</title>
-<link rel="stylesheet" href="../assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+:root{color-scheme:light;--blue:#175cd3;--ink:#172033;--muted:#667085;--line:#d0d5dd}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 12% 12%,#dbeafe 0,transparent 34%),linear-gradient(135deg,#f8fafc,#eef2ff);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
+.login-wrap{width:min(100%,440px);background:#fff;border:1px solid #e4e7ec;border-radius:22px;padding:34px;box-shadow:0 24px 70px rgba(16,24,40,.12)}
+.login-mark{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:#eaf2ff;color:var(--blue);font-size:26px;margin-bottom:20px}
+h1{font-size:26px;line-height:1.2;letter-spacing:-.6px;margin:0 0 10px}p{color:var(--muted);margin:0 0 24px}
+form{display:grid;gap:9px}label{font-size:14px;font-weight:650;margin-top:7px}input{width:100%;height:46px;border:1px solid var(--line);border-radius:10px;padding:0 13px;font:inherit;outline:none}input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #175cd322}
+button{height:47px;margin-top:12px;border:0;border-radius:10px;background:var(--blue);color:#fff;font:inherit;font-weight:700;cursor:pointer}button:hover{background:#1849a9}.alert{background:#fef3f2;color:#b42318;border:1px solid #fecdca;border-radius:10px;padding:11px 13px;margin:0 0 16px;font-size:14px}
+.login-foot{font-size:12px;text-align:center;margin-top:22px;color:#98a2b3}
+@media(max-width:480px){body{padding:14px}.login-wrap{padding:25px 20px;border-radius:18px}h1{font-size:24px}}
+</style>
 </head>
 <body class="login-page">
 <div class="login-card">
@@ -338,6 +349,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <input type="password" name="password" autocomplete="current-password" required>
 <button class="btn primary full" type="submit">Masuk</button>
 </form>
+<div class="login-foot">SDN Ciburayut 01 · Portal Administrasi Guru</div>
 </div>
 </body>
 </html>
