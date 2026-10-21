@@ -4,7 +4,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
-function reply(int $status, array $payload): never {
+function reply(int $status, array $payload) {
     http_response_code($status);
     echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
