@@ -43,10 +43,16 @@ main{width:min(980px,100% - 28px);margin:28px auto}.top{display:flex;gap:14px;al
 <script>
 const photo=document.getElementById('photo'),preview=document.getElementById('preview'),make=document.getElementById('make'),statusBox=document.getElementById('status');
 photo.addEventListener('change',()=>{const f=photo.files[0];if(!f){preview.classList.add('hidden');return}preview.src=URL.createObjectURL(f);preview.classList.remove('hidden')});
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 make.addEventListener('click',async()=>{const file=photo.files[0];if(!file){statusBox.textContent='Pilih foto terlebih dahulu.';return}if(file.size>12*1024*1024){statusBox.textContent='Ukuran foto maksimal 12 MB.';return}
-make.disabled=true;statusBox.textContent='Mengirim foto ke layanan AI. Proses dapat memerlukan beberapa menit.';
+make.disabled=true;document.getElementById('resultCard').classList.add('hidden');statusBox.textContent='Mengirim foto ke antrean AI...';
 try{const fd=new FormData();fd.append('image',file);fd.append('duration',document.getElementById('duration').value);fd.append('motion',document.getElementById('motion').value);fd.append('prompt',document.getElementById('prompt').value);
-const r=await fetch('generate.php',{method:'POST',body:fd,credentials:'same-origin'});const d=await r.json();if(!r.ok)throw new Error(d.error||('HTTP '+r.status));if(!d.video_url)throw new Error('URL video tidak ditemukan dalam respons.');
-const video=document.getElementById('result');video.src=d.video_url;document.getElementById('download').href=d.video_url;document.getElementById('resultCard').classList.remove('hidden');statusBox.textContent='Video berhasil dibuat. Tekan putar atau Simpan MP4.';
-}catch(e){statusBox.textContent='Belum berhasil: '+e.message+'. Pastikan API key fal.ai sudah dikonfigurasi di server.'}finally{make.disabled=false}});
+const r=await fetch('generate.php',{method:'POST',body:fd,credentials:'same-origin'});const d=await r.json();if(!r.ok)throw new Error(d.error||('HTTP '+r.status));if(!d.request_id)throw new Error('ID proses video tidak diterima.');
+statusBox.textContent='Video masuk antrean. Sedang dibuat...';
+for(let attempt=0;attempt<90;attempt++){await wait(4000);const sr=await fetch('status.php',{method:'GET',credentials:'same-origin',cache:'no-store'});const sd=await sr.json();if(!sr.ok)throw new Error(sd.error||('Status HTTP '+sr.status));
+if(sd.status==='completed'&&sd.video_url){const video=document.getElementById('result');video.src=sd.video_url;document.getElementById('download').href=sd.video_url;document.getElementById('resultCard').classList.remove('hidden');statusBox.textContent='Video berhasil dibuat. Tekan putar atau Simpan MP4.';return}
+if(sd.status==='failed'||sd.status==='cancelled')throw new Error(sd.error||'Proses video gagal.');
+statusBox.textContent='Sedang membuat video AI... Status: '+(sd.status||'menunggu')+'.';}
+throw new Error('Pembuatan video masih berlangsung lebih lama dari batas tunggu halaman. Coba cek lagi beberapa saat kemudian.');
+}catch(e){statusBox.textContent='Belum berhasil: '+e.message+'. Pastikan sesi login dan API key fal.ai sudah benar di server.'}finally{make.disabled=false}});
 </script></body></html>
