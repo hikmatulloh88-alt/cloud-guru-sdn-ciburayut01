@@ -22,6 +22,7 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/ai-studio
     - /bin/cp ai-studio/index.php $DEPLOYPATH/ai-studio/index.php
     - /bin/cp ai-studio/generate.php $DEPLOYPATH/ai-studio/generate.php
+    - /bin/cp ai-studio/status.php $DEPLOYPATH/ai-studio/status.php
     - /bin/mkdir -p .deploy_builder_restore
     - /usr/bin/unzip -o "CLOUD_GURU_BUILDER_PULIHKAN (1).zip" "public_html/builder/index.php" "public_html/builder/assets/builder.css" "public_html/builder/assets/menu_fix.js" -d .deploy_builder_restore
     - /bin/mkdir -p $DEPLOYPATH/builder/assets
