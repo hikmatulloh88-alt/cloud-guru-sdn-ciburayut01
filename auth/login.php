@@ -250,8 +250,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = mysqli_query($koneksi, "SHOW COLUMNS FROM users");
             if ($res) while ($c = mysqli_fetch_assoc($res)) $columns[$c['Field']] = true;
 
-            $userCol = $columns['username'] ? 'username' : ($columns['user'] ?? false ? 'user' : null);
-            $passCol = $columns['password'] ? 'password' : ($columns['pass'] ?? false ? 'pass' : null);
+            $userCol = !empty($columns['username']) ? 'username' : (!empty($columns['user']) ? 'user' : null);
+            $passCol = !empty($columns['password']) ? 'password' : (!empty($columns['pass']) ? 'pass' : null);
 
             if (!$userCol || !$passCol) {
                 throw new RuntimeException('Struktur akun Absensi tidak sesuai.');
@@ -337,7 +337,7 @@ button{height:47px;margin-top:12px;border:0;border-radius:10px;background:var(--
 </style>
 </head>
 <body class="login-page">
-<div class="login-card">
+<div class="login-wrap">
 <div class="logo">☁️</div>
 <h1>Cloud Administrasi Guru</h1>
 <p>Gunakan username dan password yang sama dengan Aplikasi Absensi.</p>
