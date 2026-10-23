@@ -30,11 +30,8 @@ main{width:min(980px,100% - 28px);margin:28px auto}.top{display:flex;gap:14px;al
 <h2>1. Pilih foto</h2><p class="hint">Gunakan foto yang Anda berhak gunakan. Format JPG, PNG, atau WebP; maksimal 12 MB.</p>
 <div class="field"><input id="photo" type="file" accept="image/jpeg,image/png,image/webp"></div>
 <img id="preview" class="preview hidden" alt="Pratinjau foto">
-<div class="grid">
-<div class="field"><label for="duration">Durasi</label><select id="duration"><option value="5">5 detik</option><option value="10">10 detik</option></select></div>
-<div class="field"><label for="motion">Gaya gerakan</label><select id="motion"><option value="Gerakan natural, realistis, sinematik lembut">Natural sinematik</option><option value="Subjek tersenyum lembut lalu menoleh ke kamera, gerakan wajah alami">Senyum dan menoleh</option><option value="Gerakan kamera perlahan mendekat, rambut dan pakaian bergerak lembut tertiup angin">Kamera mendekat</option><option value="Subjek melambaikan tangan secara alami, menjaga wajah dan identitas tetap konsisten">Melambaikan tangan</option></select></div>
-</div>
-<div class="field"><label for="prompt">Instruksi tambahan</label><textarea id="prompt" maxlength="1500" placeholder="Contoh: latar tetap sama, ekspresi ramah, gerakan tidak berlebihan.">Pertahankan identitas dan bentuk wajah, gerakan realistis dan halus, latar tetap konsisten, hindari distorsi dan perubahan karakter.</textarea></div>
+<div class="field"><label for="duration">Durasi video</label><select id="duration"><option value="5">5 detik</option><option value="10">10 detik</option></select></div>
+<div class="field"><label for="prompt">Instruksi bebas</label><textarea id="prompt" maxlength="2000" placeholder="Tulis bebas gerakan, ekspresi, suasana, atau arahan kamera yang kamu inginkan...">Pertahankan identitas dan bentuk wajah, gerakan realistis dan halus, latar tetap konsisten, hindari distorsi dan perubahan karakter.</textarea><p class="hint">Instruksi bebas—tidak dibatasi pilihan gerakan.</p></div>
 <div class="actions"><button id="make">✦ Buat Video AI</button><a class="btn" href="/" style="background:#263352;color:#fff">Kembali ke Cloud Guru</a></div>
 <div id="status" class="status" role="status">Pilih foto, lalu buat video. Pembuatan video memakai API AI dan dapat dikenai biaya.</div>
 </section>
@@ -46,11 +43,11 @@ photo.addEventListener('change',()=>{const f=photo.files[0];if(!f){preview.class
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 make.addEventListener('click',async()=>{const file=photo.files[0];if(!file){statusBox.textContent='Pilih foto terlebih dahulu.';return}if(file.size>12*1024*1024){statusBox.textContent='Ukuran foto maksimal 12 MB.';return}
 make.disabled=true;document.getElementById('resultCard').classList.add('hidden');statusBox.textContent='Mengirim foto ke antrean AI...';
-try{const fd=new FormData();fd.append('image',file);fd.append('duration',document.getElementById('duration').value);fd.append('motion',document.getElementById('motion').value);fd.append('prompt',document.getElementById('prompt').value);
+try{const fd=new FormData();fd.append('image',file);fd.append('duration',document.getElementById('duration').value);fd.append('prompt',document.getElementById('prompt').value);
 const r=await fetch('generate.php',{method:'POST',body:fd,credentials:'same-origin'});const d=await r.json();if(!r.ok)throw new Error(d.error||('HTTP '+r.status));if(!d.request_id)throw new Error('ID proses video tidak diterima.');
 statusBox.textContent='Video masuk antrean. Sedang dibuat...';
 for(let attempt=0;attempt<90;attempt++){await wait(4000);const sr=await fetch('status.php',{method:'GET',credentials:'same-origin',cache:'no-store'});const sd=await sr.json();if(!sr.ok)throw new Error(sd.error||('Status HTTP '+sr.status));
-if(sd.status==='completed'&&sd.video_url){const video=document.getElementById('result');video.src=sd.video_url;document.getElementById('download').href=sd.video_url;document.getElementById('resultCard').classList.remove('hidden');statusBox.textContent='Video berhasil dibuat. Tekan putar atau Simpan MP4.';return}
+if(sd.status==='completed'&&sd.video_url){const video=document.getElementById('result');video.src=sd.video_url;document.getElementById('download').href=sd.download_url||'download.php';document.getElementById('resultCard').classList.remove('hidden');statusBox.textContent='Video berhasil dibuat. Tekan putar atau Simpan MP4.';return}
 if(sd.status==='failed'||sd.status==='cancelled')throw new Error(sd.error||'Proses video gagal.');
 statusBox.textContent='Sedang membuat video AI... Status: '+(sd.status||'menunggu')+'.';}
 throw new Error('Pembuatan video masih berlangsung lebih lama dari batas tunggu halaman. Coba cek lagi beberapa saat kemudian.');

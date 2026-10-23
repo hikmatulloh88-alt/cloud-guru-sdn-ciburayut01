@@ -60,7 +60,10 @@ try {
             ai_reply(502, ['error' => 'Proses selesai tetapi URL video tidak tersedia.']);
         }
         unset($_SESSION['ai_studio_request_id']);
-        ai_reply(200, ['status' => 'completed', 'video_url' => $videoUrl]);
+        // Keep only a short-lived URL in the login session; no video is saved in Cloud Guru storage.
+        $_SESSION['ai_studio_video_url'] = $videoUrl;
+        $_SESSION['ai_studio_video_expires'] = time() + 1800;
+        ai_reply(200, ['status' => 'completed', 'video_url' => $videoUrl, 'download_url' => 'download.php']);
     }
     if (in_array($status, ['FAILED', 'CANCELLED'], true)) {
         unset($_SESSION['ai_studio_request_id']);
