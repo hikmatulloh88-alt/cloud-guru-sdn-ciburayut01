@@ -66,9 +66,7 @@ if ($uploadError !== UPLOAD_ERR_OK) {
 
 $duration = (string)($_POST['duration'] ?? '5');
 if (!in_array($duration, ['5', '10'], true)) reply(422, ['error' => 'Durasi harus 5 atau 10 detik.']);
-$motion = trim((string)($_POST['motion'] ?? 'Gerakan natural, realistis, sinematik lembut'));
 $prompt = trim((string)($_POST['prompt'] ?? ''));
-$prompt = trim($motion . '. ' . $prompt);
 if ($prompt === '' || mb_strlen($prompt) > 2000) reply(422, ['error' => 'Prompt wajib diisi dan maksimal 2000 karakter.']);
 
 $file = $_FILES['image'];
