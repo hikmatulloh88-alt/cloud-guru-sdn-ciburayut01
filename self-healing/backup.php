@@ -12,6 +12,12 @@ function sh_normalize_path(string $path): string
     return $real;
 }
 
+function sh_path_starts_with(string $path, string $prefix): bool
+{
+    // PHP 7.4 compatibility: str_starts_with() is available only in PHP 8+.
+    return substr($path, 0, strlen($prefix)) === $prefix;
+}
+
 function sh_is_allowed_path(string $path): bool
 {
     $real = sh_normalize_path($path);
@@ -23,7 +29,7 @@ function sh_is_allowed_path(string $path): bool
         }
 
         $prefix = rtrim($rootReal, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        if ($real === $rootReal || str_starts_with($real, $prefix)) {
+        if ($real === $rootReal || sh_path_starts_with($real, $prefix)) {
             return true;
         }
     }
@@ -83,7 +89,7 @@ function sh_restore_file(string $backup, string $target): void
     }
 
     $backupPrefix = rtrim($backupDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-    if (!($backup === $backupDir || str_starts_with($backup, $backupPrefix))) {
+    if (!($backup === $backupDir || sh_path_starts_with($backup, $backupPrefix))) {
         throw new RuntimeException('Backup file is outside the backup directory.');
     }
 
