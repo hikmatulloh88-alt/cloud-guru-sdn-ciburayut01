@@ -2,8 +2,10 @@
 declare(strict_types=1);
 require_once __DIR__.'/../includes/auth.php';
 wajib_login();
+require_once __DIR__.'/../includes/csrf.php';
 require_once __DIR__.'/../config/google_drive_lib.php';
 if($_SERVER['REQUEST_METHOD']!=='POST'){http_response_code(405);exit('Method tidak diizinkan');}
+cloudguru_csrf_require_valid();
 try{
  $uid=gdrive_user_id();if($uid<1)throw new RuntimeException('Akun tidak terbaca. Login ulang.');
  $id=trim((string)($_POST['id']??''));if($id===''||!preg_match('/^[A-Za-z0-9_-]+$/',$id))throw new RuntimeException('ID file tidak valid.');
