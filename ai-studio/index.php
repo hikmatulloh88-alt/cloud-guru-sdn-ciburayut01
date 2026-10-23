@@ -41,9 +41,29 @@ main{width:min(980px,100% - 28px);margin:28px auto}.top{display:flex;gap:14px;al
 const photo=document.getElementById('photo'),preview=document.getElementById('preview'),make=document.getElementById('make'),statusBox=document.getElementById('status');
 photo.addEventListener('change',()=>{const f=photo.files[0];if(!f){preview.classList.add('hidden');return}preview.src=URL.createObjectURL(f);preview.classList.remove('hidden')});
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function preparePhoto(file){
+  if(file.size<=1.75*1024*1024)return file;
+  statusBox.textContent='Mengoptimalkan ukuran foto untuk batas upload server...';
+  const img=new Image(),url=URL.createObjectURL(file);
+  try{
+    await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Foto tidak dapat dibaca browser.'));img.src=url;});
+    let w=img.naturalWidth,h=img.naturalHeight;
+    if(Math.max(w,h)>1800){const s=1800/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+    for(let pass=0;pass<6;pass++){
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Browser tidak mendukung kompresi foto.');
+      ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+      let q=0.84,blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',q));
+      while(blob&&blob.size>1.75*1024*1024&&q>0.5){q-=0.08;blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',q));}
+      if(blob&&blob.size<=1.75*1024*1024)return new File([blob],(file.name.replace(/\\.[^.]+$/,'')||'photo')+'.jpg',{type:'image/jpeg'});
+      w=Math.round(w*0.78);h=Math.round(h*0.78);
+    }
+    throw new Error('Foto belum bisa diperkecil di bawah batas server. Coba foto lain.');
+  }finally{URL.revokeObjectURL(url);}
+}
 make.addEventListener('click',async()=>{const file=photo.files[0];if(!file){statusBox.textContent='Pilih foto terlebih dahulu.';return}if(file.size>12*1024*1024){statusBox.textContent='Ukuran foto maksimal 12 MB.';return}
 make.disabled=true;document.getElementById('resultCard').classList.add('hidden');statusBox.textContent='Mengirim foto ke antrean AI...';
-try{const fd=new FormData();fd.append('image',file);fd.append('duration',document.getElementById('duration').value);fd.append('prompt',document.getElementById('prompt').value);
+try{const uploadFile=await preparePhoto(file);const fd=new FormData();fd.append('image',uploadFile);fd.append('duration',document.getElementById('duration').value);fd.append('prompt',document.getElementById('prompt').value);
 const r=await fetch('generate.php',{method:'POST',body:fd,credentials:'same-origin'});const d=await r.json();if(!r.ok)throw new Error(d.error||('HTTP '+r.status));if(!d.request_id)throw new Error('ID proses video tidak diterima.');
 statusBox.textContent='Video masuk antrean. Sedang dibuat...';
 for(let attempt=0;attempt<90;attempt++){await wait(4000);const sr=await fetch('status.php',{method:'GET',credentials:'same-origin',cache:'no-store'});const sd=await sr.json();if(!sr.ok)throw new Error(sd.error||('Status HTTP '+sr.status));
