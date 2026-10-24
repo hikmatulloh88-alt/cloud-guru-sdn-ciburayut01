@@ -37,3 +37,4 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/auth
     - /bin/mkdir -p $DEPLOYPATH/builder
     - /bin/cp builder/index.php $DEPLOYPATH/builder/index.php
+    - if [ -f "$DEPLOYPATH/admin/tampilan/index.php" ]; then /usr/bin/perl -0pi -e 's{<a\b(?:(?!</a>).)*Buka Website Builder(?:(?!</a>).)*</a>}{}is' "$DEPLOYPATH/admin/tampilan/index.php"; fi
