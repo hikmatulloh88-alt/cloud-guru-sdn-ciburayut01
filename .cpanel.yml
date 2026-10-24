@@ -35,14 +35,6 @@ deployment:
     - /bin/cp storage/download.php $DEPLOYPATH/storage/
     - /bin/cp storage/thumbnail.php $DEPLOYPATH/storage/
     - /bin/mkdir -p $DEPLOYPATH/auth
-    - /bin/mkdir -p .deploy_builder_restore
-    - /usr/bin/unzip -o "CLOUD_GURU_BUILDER_PULIHKAN (1).zip" "public_html/builder/index.php" "public_html/builder/assets/builder.css" "public_html/builder/assets/menu_fix.js" -d .deploy_builder_restore
-    - /bin/mkdir -p $DEPLOYPATH/builder/assets
-    - /bin/cp .deploy_builder_restore/public_html/builder/index.php $DEPLOYPATH/builder/index.php
-    - /bin/cp .deploy_builder_restore/public_html/builder/assets/builder.css $DEPLOYPATH/builder/assets/builder.css
-    - /bin/cp $DEPLOYPATH/builder/assets/builder.css .deploy_builder_base.css
-    - /bin/cat builder_workspace_fix.css >> .deploy_builder_base.css
-    - /bin/cp .deploy_builder_base.css $DEPLOYPATH/builder/assets/builder.css
-    - /bin/rm -f .deploy_builder_base.css
-    - /bin/cp .deploy_builder_restore/public_html/builder/assets/menu_fix.js $DEPLOYPATH/builder/assets/menu_fix.js
-    - /bin/rm -rf .deploy_builder_restore
+    - /bin/mkdir -p $DEPLOYPATH/builder
+    - /bin/cp builder/index.php $DEPLOYPATH/builder/index.php
+    - if [ -f "$DEPLOYPATH/admin/tampilan/index.php" ]; then /usr/bin/perl -0pi -e 's{<a\b(?:(?!</a>).)*Buka Website Builder(?:(?!</a>).)*</a>}{}is' "$DEPLOYPATH/admin/tampilan/index.php"; fi
