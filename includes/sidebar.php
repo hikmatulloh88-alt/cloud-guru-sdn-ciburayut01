@@ -111,7 +111,7 @@ body.cg-sidebar-ready .cg-main-content{margin-left:var(--cg-content-offset);tran
   </div>
 
   <div class="cg-user">
-    <div class="cg-avatar" aria-hidden="true"><?= cg_sidebar_e(mb_strtoupper(mb_substr(trim((string)$cgName), 0, 1, 'UTF-8'), 'UTF-8')) ?></div>
+    <div class="cg-avatar" aria-hidden="true"><?= cg_sidebar_e(strtoupper(substr(trim((string)$cgName), 0, 1))) ?></div>
     <div class="cg-user-info"><div class="cg-user-name"><?= cg_sidebar_e($cgName) ?></div><div class="cg-user-role"><?= $cgIsAdmin ? 'Administrator' : 'Guru' ?></div></div>
   </div>
 
