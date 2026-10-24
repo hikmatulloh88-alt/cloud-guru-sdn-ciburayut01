@@ -5,6 +5,7 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/includes
     - /bin/cp includes/auth.php $DEPLOYPATH/includes/auth.php
     - /bin/cp includes/csrf.php $DEPLOYPATH/includes/csrf.php
+    - /bin/cp includes/sidebar.php $DEPLOYPATH/includes/sidebar.php
     - /bin/mkdir -p $DEPLOYPATH/auth
     - /bin/cp auth/login.php $DEPLOYPATH/auth/login.php
     - /bin/mkdir -p $DEPLOYPATH/ai-studio
@@ -14,7 +15,7 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/self-healing
     - /bin/cp self-healing/logger.php $DEPLOYPATH/self-healing/
     - /bin/cp self-healing/patch_engine.php $DEPLOYPATH/self-healing/
-    - /bin/mkdir -p $DEPLOYPATH/gdrive
+    - /bin/cp self-healing/dashboard.php $DEPLOYPATH/self-healing/\n    - /bin/cp self-healing/admin.php $DEPLOYPATH/self-healing/\n    - /bin/mkdir -p $DEPLOYPATH/gdrive
     - /bin/cp gdrive/connect.php $DEPLOYPATH/gdrive/
     - /bin/cp gdrive/callback.php $DEPLOYPATH/gdrive/
     - /bin/mkdir -p $DEPLOYPATH/config
