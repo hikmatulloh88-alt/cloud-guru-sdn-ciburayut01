@@ -487,6 +487,7 @@ body{background:#f5f8fb!important;color:#102a43}
   .published-wrap .school-live-stats-head{padding-top:30px!important}
 }
 
+</style>
 <style id="cloud-guru-v42-premium-home">
 /* V4.2 PREMIUM HOME — VISUAL ONLY. Tidak mengubah database, routing, atau modul lain. */
 :root{--cg-blue:#0b63d1;--cg-navy:#071d3b;--cg-cyan:#22d3ee;--cg-ink:#102a43;--cg-muted:#64748b}
