@@ -15,7 +15,7 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/self-healing
     - /bin/cp self-healing/logger.php $DEPLOYPATH/self-healing/
     - /bin/cp self-healing/patch_engine.php $DEPLOYPATH/self-healing/
-    - /bin/mkdir -p $DEPLOYPATH/gdrive
+    - /bin/cp self-healing/dashboard.php $DEPLOYPATH/self-healing/\n    - /bin/cp self-healing/admin.php $DEPLOYPATH/self-healing/\n    - /bin/mkdir -p $DEPLOYPATH/gdrive
     - /bin/cp gdrive/connect.php $DEPLOYPATH/gdrive/
     - /bin/cp gdrive/callback.php $DEPLOYPATH/gdrive/
     - /bin/mkdir -p $DEPLOYPATH/config
