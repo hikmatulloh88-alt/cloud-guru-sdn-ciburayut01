@@ -1,14 +1,17 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/../includes/auth.php';
-wajib_login();
-require_once __DIR__ . '/../includes/csrf.php';
 try {
+    require_once __DIR__ . '/../includes/auth.php';
+    if (!function_exists('wajib_login')) {
+        throw new RuntimeException('Cloud Guru login helper is missing.');
+    }
+    wajib_login();
+    require_once __DIR__ . '/../includes/csrf.php';
     require_once __DIR__ . '/../config/google_drive_lib.php';
 } catch (Throwable $bootstrapError) {
     error_log('Cloud Guru Storage bootstrap: ' . $bootstrapError->getMessage());
     http_response_code(503);
-    ?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Penyimpanan sedang diperbaiki</title><style>body{font:16px system-ui,sans-serif;background:#f4f7fb;color:#172033;margin:0;min-height:100vh;display:grid;place-items:center}.card{max-width:560px;margin:20px;background:#fff;border:1px solid #e0e6ef;border-radius:16px;padding:28px;box-shadow:0 10px 30px #17203312}a{color:#155eef;font-weight:700}</style></head><body><main class="card"><h1>Penyimpanan sedang tidak tersedia</h1><p>Koneksi database atau konfigurasi Google Drive belum dapat dimuat. Detail teknis sudah dicatat pada log PHP server.</p><p><a href="/dashboard/index.php">Kembali ke Dashboard</a></p></main></body></html><?php
+    ?><!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Penyimpanan sedang diperbaiki</title><style>body{font:16px system-ui,sans-serif;background:#f4f7fb;color:#172033;margin:0;min-height:100vh;display:grid;place-items:center}.card{max-width:560px;margin:20px;background:#fff;border:1px solid #e0e6ef;border-radius:16px;padding:28px;box-shadow:0 10px 30px #17203312}a{color:#155eef;font-weight:700}</style></head><body><main class="card"><h1>Penyimpanan sedang tidak tersedia</h1><p>Komponen login, database, atau Google Drive belum dapat dimuat. Rincian sudah dicatat di log PHP server.</p><p><a href="/auth/login.php">Kembali ke Login</a></p></main></body></html><?php
     exit;
 }
 $error = '';
