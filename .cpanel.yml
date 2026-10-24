@@ -30,6 +30,7 @@ deployment:
     - /bin/cp storage/upload.php $DEPLOYPATH/storage/
     - /bin/cp storage/delete.php $DEPLOYPATH/storage/
     - /bin/cp storage/download.php $DEPLOYPATH/storage/
+    - /bin/cp storage/thumbnail.php $DEPLOYPATH/storage/
     - /bin/mkdir -p $DEPLOYPATH/auth
     - /bin/mkdir -p .deploy_builder_restore
     - /usr/bin/unzip -o "CLOUD_GURU_BUILDER_PULIHKAN (1).zip" "public_html/builder/index.php" "public_html/builder/assets/builder.css" "public_html/builder/assets/menu_fix.js" -d .deploy_builder_restore
