@@ -9,6 +9,17 @@ require_once __DIR__.'/config/school_stats.php';
 $pageSlug=strtolower(trim((string)($_GET['page']??'home')));
 if(!preg_match('/^[a-z0-9-]{1,120}$/',$pageSlug))$pageSlug='home';
 $settings=['site_name'=>'SDN CIBURAYUT 01','tagline'=>'Portal Informasi Sekolah','logo_url'=>'','favicon_url'=>'','address'=>'Cigombong, Kabupaten Bogor','phone'=>'','email'=>'info@sdnciburayut01.com','whatsapp'=>'','facebook_url'=>'','instagram_url'=>'','youtube_url'=>'','maps_embed_url'=>'','maps_link'=>'','footer_text'=>'© '.date('Y').' SDN Ciburayut 01. Semua hak dilindungi.','primary_color'=>'#1565c0','seo_title'=>'','seo_description'=>'Portal resmi SDN Ciburayut 01. Informasi sekolah, berita, agenda, profil guru, galeri, dan layanan digital.','seo_keywords'=>'SDN Ciburayut 01, sekolah dasar, Ciburayut, Cigombong, Bogor, portal sekolah','seo_author'=>'SDN Ciburayut 01','seo_og_image'=>'','seo_canonical'=>'','seo_robots'=>'index,follow'];
+/* Homepage hero values must be whitelisted before reading website_builder_settings. */
+$settings += [
+    'hero_image' => '',
+    'hero_eyebrow' => 'PORTAL INFORMASI SEKOLAH',
+    'hero_title' => 'Sekolah Ramah Anak, Berkarakter, dan Berbudaya Digital',
+    'hero_subtitle' => 'Portal resmi sekolah untuk informasi, kegiatan, profil guru, layanan pendidikan, dan berbagai informasi terkini.',
+    'hero_button_text' => 'Jelajahi Portal',
+    'hero_button_url' => '/?page=informasi',
+    'hero_button2_text' => 'Profil Sekolah',
+    'hero_button2_url' => '/?page=profil',
+];
 try{$q=$pdo->query("SELECT setting_key,setting_value FROM website_builder_settings");foreach($q as $r)if(array_key_exists($r['setting_key'],$settings))$settings[$r['setting_key']]=$r['setting_value'];}catch(Throwable $e){}
 
 /* FINAL CONTENT DEFAULTS: jangan biarkan footer kosong ketika database lama belum punya nilai. */
