@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /* Google Drive integration library. Keep google_drive.php server-only. */
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/google_drive.php';
 
 if (!isset($pdo) || !($pdo instanceof PDO)) {
