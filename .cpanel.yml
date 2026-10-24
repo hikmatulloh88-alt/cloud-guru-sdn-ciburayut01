@@ -19,6 +19,8 @@ deployment:
     - /bin/cp config/google_drive_lib.php $DEPLOYPATH/config/google_drive_lib.php
     - /bin/chmod 644 $DEPLOYPATH/config/google_drive_lib.php
     - /bin/cp config/school_stats.php $DEPLOYPATH/config/
+    - /bin/mkdir -p $DEPLOYPATH/assets/css
+    - /bin/cp assets/css/cloud-guru-public-overrides.css $DEPLOYPATH/assets/css/cloud-guru-public-overrides.css
     - /bin/cp index.php $DEPLOYPATH/index.php
     - /bin/mkdir -p $DEPLOYPATH/storage
     - /bin/cp storage/index.php $DEPLOYPATH/storage/
