@@ -5,6 +5,7 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/includes
     - /bin/cp includes/auth.php $DEPLOYPATH/includes/auth.php
     - /bin/cp includes/csrf.php $DEPLOYPATH/includes/csrf.php
+    - /bin/cp includes/sidebar.php $DEPLOYPATH/includes/sidebar.php
     - /bin/mkdir -p $DEPLOYPATH/auth
     - /bin/cp auth/login.php $DEPLOYPATH/auth/login.php
     - /bin/mkdir -p $DEPLOYPATH/ai-studio
