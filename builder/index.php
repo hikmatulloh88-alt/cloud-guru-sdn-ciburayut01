@@ -459,7 +459,22 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
 .canvas-wrap{padding:14px;background:#e8edf5;min-height:calc(100vh - 126px);overflow:auto;display:flex;align-items:flex-start;justify-content:center}
 #siteFrame{width:100%;height:calc(100vh - 165px);min-height:570px;border:1px solid #d7dfeb;border-radius:8px;background:white;box-shadow:0 8px 25px #152c4b14;transition:width .2s ease}
 .right-body{padding:0 14px 14px}.tool-help{font-size:12px;color:#60718a;line-height:1.65}.selected-info{padding:11px;border:1px solid #d4e4ff;border-radius:10px;background:#f4f8ff;font-size:12px;color:#345273;line-height:1.55}.actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.actions-grid button{padding:9px 7px;font-size:12px}
-.newpage{display:grid;gap:7px;padding:0 11px 14px}.newpage input{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px}.newpage label{font-size:11px;color:var(--muted);font-weight:700}
+.newpage{display:none}
+.cgv-newpage-overlay{position:fixed;inset:0;z-index:10000;background:rgba(12,27,48,.52);display:flex;align-items:center;justify-content:center;padding:16px}
+.cgv-newpage-overlay[hidden]{display:none!important}
+.cgv-newpage-card{width:min(490px,100%);background:#fff;border:1px solid #dfe6f0;border-radius:16px;box-shadow:0 24px 80px rgba(10,25,48,.26);overflow:hidden}
+.cgv-newpage-header{display:flex;align-items:flex-start;gap:14px;padding:21px 22px;border-bottom:1px solid #e8edf4}
+.cgv-newpage-header>div{flex:1}.cgv-newpage-header h2{font-size:20px;margin:0 0 4px;color:#192537}.cgv-newpage-header p{font-size:12px;color:#69798e;margin:0;line-height:1.6}
+.cgv-newpage-header button{border:1px solid #dce4ef;background:#fff;border-radius:9px;width:34px;height:34px;font-size:22px;line-height:1;cursor:pointer}
+.cgv-newpage-fields{display:grid;gap:7px;padding:20px 22px 8px}.cgv-newpage-fields label{font-size:12px;font-weight:800;color:#34445b;margin-top:5px}
+.cgv-newpage-fields input{box-sizing:border-box;width:100%;min-width:0;border:1px solid #ccd7e6;border-radius:9px;padding:12px;font:14px system-ui;color:#1f2937;outline-offset:2px}
+.cgv-newpage-slug{display:flex;align-items:center;gap:0;border:1px solid #ccd7e6;border-radius:9px;overflow:hidden}.cgv-newpage-slug span{font-size:11px;color:#728096;background:#f5f7fb;padding:13px 8px;white-space:nowrap;border-right:1px solid #ccd7e6}.cgv-newpage-slug input{border:0;border-radius:0}
+.cgv-newpage-help{font-size:11px;line-height:1.5;color:#77859a;margin:0}.cgv-newpage-error{padding:0 22px;color:#b42318;font-size:12px;min-height:5px}.cgv-newpage-actions{display:flex;justify-content:flex-end;gap:9px;padding:16px 22px 20px}
+.canvas-hint{font-size:11px;color:#718098;margin-left:4px;line-height:1.35}
+.canvas-head{gap:10px}
+@media(max-width:1250px){.topbar{flex-wrap:wrap;gap:8px;padding:9px 11px}.brand{flex:1}.page-select{max-width:none;min-width:140px}.top-spacer{display:none}.status{flex:1}.topbar #viewPublic{display:none}.topbar button{padding:9px 11px}}
+@media(max-width:700px){.cgv-newpage-overlay{padding:8px}.cgv-newpage-header,.cgv-newpage-fields{padding-left:16px;padding-right:16px}.cgv-newpage-actions{padding:12px 16px 16px}.cgv-newpage-slug span{font-size:10px;padding:13px 6px}.canvas-hint{display:none}}
+
 #imageFile{display:none}.bottom-status{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:9px 14px;color:var(--muted);font-size:11px;border-top:1px solid var(--line)}
 @media(max-width:1100px){.workspace{grid-template-columns:180px minmax(280px,1fr)}.right-panel{grid-column:1/-1}.right-panel .right-body{display:grid;grid-template-columns:1fr 1fr;gap:10px}.right-panel .panel-title{padding-bottom:7px}}
 @media(max-width:700px){.topbar{flex-wrap:wrap;padding:9px}.brand{width:100%}.page-select{flex:1;max-width:none}.top-spacer{display:none}.status{flex:1}.workspace{display:flex;flex-direction:column;padding:8px}.left-panel{order:2}.center-panel{order:1}.right-panel{order:3}.insert-list{grid-template-columns:repeat(2,minmax(0,1fr))}.insert-button{font-size:12px;padding:8px}.insert-button .ico{flex-shrink:0}.canvas-wrap{padding:7px;min-height:420px}#siteFrame{height:68vh;min-height:430px}.right-panel .right-body{display:block}.topbar .btn-outline,.topbar .btn-primary,.topbar .btn-green{padding:9px;font-size:12px}}
@@ -490,18 +505,11 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
       <button class="insert-button" data-insert="spacer"><span class="ico">↕</span> Jarak</button>
     </div>
     <div class="left-tip"><b>Tips:</b> Klik teks langsung di pratinjau untuk mengedit. Pilih bagian lalu gunakan panel kanan untuk memindahkan atau menghapus.</div>
-    <div class="panel-title">Halaman baru</div>
-    <div class="newpage">
-      <label for="newTitle">Nama halaman</label>
-      <input id="newTitle" maxlength="180" placeholder="Contoh: Program Sekolah">
-      <label for="newSlug">Alamat halaman</label>
-      <input id="newSlug" maxlength="120" placeholder="program-sekolah">
-      <button id="createPageButton" class="btn-primary">＋ Buat Halaman</button>
-    </div>
+    <div class="left-tip" style="margin-top:0"><b>Ingin membuat halaman lain?</b><br>Klik tombol <b>＋ Halaman Baru</b> di bagian atas.</div>
   </aside>
   <section class="panel center-panel">
     <div class="canvas-head">
-      <b id="canvasTitle">Pratinjau website</b>
+      <b id="canvasTitle">Pratinjau website</b><span class="canvas-hint">Klik teks untuk edit · tambah blok di kiri · pilih bagian untuk memindahkan</span>
       <button class="device-button active" data-device="desktop">🖥 Desktop</button>
       <button class="device-button" data-device="mobile">📱 Mobile</button>
       <span id="draftLabel" class="status"></span>
@@ -531,6 +539,26 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
   </aside>
 </main>
 <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+<div id="newPageDialog" class="cgv-newpage-overlay" hidden>
+  <section class="cgv-newpage-card" role="dialog" aria-modal="true" aria-labelledby="newPageDialogTitle">
+    <div class="cgv-newpage-header">
+      <div><h2 id="newPageDialogTitle">Buat halaman baru</h2><p>Mulai dari halaman kosong, lalu susun langsung di kanvas.</p></div>
+      <button type="button" id="closeNewPageButton" aria-label="Tutup">×</button>
+    </div>
+    <div class="cgv-newpage-fields">
+      <label for="newPageTitleDialog">Nama halaman</label>
+      <input id="newPageTitleDialog" maxlength="180" placeholder="Contoh: Program Sekolah" autocomplete="off">
+      <label for="newPageSlugDialog">Alamat halaman</label>
+      <div class="cgv-newpage-slug"><span>sdnciburayut01.com/?page=</span><input id="newPageSlugDialog" maxlength="120" placeholder="program-sekolah" autocomplete="off"></div>
+      <p class="cgv-newpage-help">Alamat dibuat otomatis dari nama halaman. Bisa diubah sebelum dibuat.</p>
+    </div>
+    <div id="newPageDialogError" class="cgv-newpage-error" aria-live="polite"></div>
+    <div class="cgv-newpage-actions">
+      <button type="button" id="cancelNewPageButton" class="btn-outline">Batal</button>
+      <button type="button" id="createPageDialogButton" class="btn-primary">Buat Halaman →</button>
+    </div>
+  </section>
+</div>
 <script>
 (function(){
 'use strict';
@@ -546,6 +574,7 @@ var dragBlock=null;
 var pageSlug=CFG.slug;
 var csrf=CFG.csrf;
 var loaded=false;
+var pageDirty=false;
 
 function setStatus(message,kind){statusEl.textContent=message;statusEl.dataset.kind=kind||'';}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -679,7 +708,7 @@ function decorateMain(){
    document.getElementById('linkEditor').style.display='block';
   }
  },true);
- currentMain.addEventListener('input',function(){setStatus('Ada perubahan belum disimpan','');});
+ currentMain.addEventListener('input',function(){pageDirty=true;setStatus('Ada perubahan belum disimpan','');});
  currentMain.addEventListener('dragstart',function(ev){
   var block=ev.target.closest('[data-cgvb-index]');
   if(!block||isProtectedBlock(block)){ev.preventDefault();return;}
@@ -695,7 +724,7 @@ function decorateMain(){
   var after=ev.clientY>rect.top+rect.height/2;
   target.parentNode.insertBefore(dragBlock,after?target.nextSibling:target);
  });
- currentMain.addEventListener('drop',function(ev){if(dragBlock){ev.preventDefault();dragBlock=null;decorateBlocks();setStatus('Urutan bagian berubah; simpan draft untuk menyimpan.','');}});
+ currentMain.addEventListener('drop',function(ev){if(dragBlock){ev.preventDefault();dragBlock=null;pageDirty=true;decorateBlocks();setStatus('Urutan bagian berubah; simpan draft untuk menyimpan.','');}});
  currentMain.addEventListener('dragend',function(){dragBlock=null;decorateBlocks();});
  // Avoid navigating to live links and prevent submitting forms inside the editable preview.
  currentMain.querySelectorAll('form').forEach(function(form){form.addEventListener('submit',function(ev){ev.preventDefault();});});
@@ -706,7 +735,7 @@ function decorateMain(){
 frame.addEventListener('load',function(){
  try{decorateMain();}catch(e){setStatus('Gagal menyiapkan kanvas: '+e.message,'error');}
 });
-document.getElementById('pageSelect').addEventListener('change',function(){window.location.href='/builder/?page='+encodeURIComponent(this.value);});
+document.getElementById('pageSelect').addEventListener('change',function(){if(pageDirty&&!window.confirm('Ada perubahan halaman yang belum disimpan. Tetap pindah halaman? Perubahan ini akan ditinggalkan.')){this.value=pageSlug;return;}pageDirty=false;window.location.href='/builder/?page='+encodeURIComponent(this.value);});
 document.querySelectorAll('[data-device]').forEach(function(button){
  button.addEventListener('click',function(){
   document.querySelectorAll('[data-device]').forEach(function(b){b.classList.toggle('active',b===button);});
@@ -728,6 +757,7 @@ function addSection(type){
  if(!html)return;
  var temp=doc.createElement('div');temp.innerHTML=html;var element=temp.firstElementChild;
  currentMain.appendChild(element);
+ pageDirty=true;
  decorateBlocks();selectBlock(element);
  setStatus('Bagian ditambahkan; simpan draft untuk menyimpan.','');
 }
@@ -750,6 +780,7 @@ document.getElementById('moveUpButton').addEventListener('click',function(){
  var prev=selectedBlock.previousElementSibling;
  while(prev&&isProtectedBlock(prev))prev=prev.previousElementSibling;
  if(prev)selectedBlock.parentNode.insertBefore(selectedBlock,prev);
+ pageDirty=true;
  decorateBlocks();selectBlock(selectedBlock);setStatus('Urutan bagian berubah; simpan draft.','');
 });
 document.getElementById('moveDownButton').addEventListener('click',function(){
@@ -757,12 +788,13 @@ document.getElementById('moveDownButton').addEventListener('click',function(){
  var next=selectedBlock.nextElementSibling;
  while(next&&isProtectedBlock(next))next=next.nextElementSibling;
  if(next)selectedBlock.parentNode.insertBefore(next,selectedBlock);
+ pageDirty=true;
  decorateBlocks();selectBlock(selectedBlock);setStatus('Urutan bagian berubah; simpan draft.','');
 });
 document.getElementById('deleteBlockButton').addEventListener('click',function(){
  if(!selectedBlock||isProtectedBlock(selectedBlock))return;
  if(!window.confirm('Hapus bagian yang dipilih?'))return;
- var old=selectedBlock;selectedBlock=null;old.remove();decorateBlocks();selectionInfo.textContent='Bagian dihapus. Simpan draft untuk menyimpan perubahan.';
+ var old=selectedBlock;selectedBlock=null;old.remove();pageDirty=true;decorateBlocks();selectionInfo.textContent='Bagian dihapus. Simpan draft untuk menyimpan perubahan.';
  setStatus('Bagian dihapus; simpan draft.','');
 });
 document.getElementById('applyLinkUrl').addEventListener('click',function(){
@@ -797,6 +829,7 @@ function uploadImage(file,input){
    if(img)img.src=data.url;
    selectedImage=img||null;
   }
+  pageDirty=true;
   setStatus('Gambar berhasil diunggah. Simpan Draft atau Publikasikan.','success');
   input.value='';
  }).catch(function(err){setStatus(err.message||'Upload gagal.','error');input.value='';});
@@ -846,6 +879,7 @@ function save(action){
  return fetch('/builder/',{method:'POST',credentials:'same-origin',body:fd,headers:{'Accept':'application/json'}})
  .then(function(resp){return resp.json().then(function(data){if(!resp.ok||!data.ok)throw new Error(data.message||'Operasi gagal.');return data;});})
  .then(function(data){
+  pageDirty=false;
   setStatus(data.message||'Berhasil.','success');
   if(action==='save_draft'){document.getElementById('draftLabel').textContent='Draft disimpan '+(data.updated_at||'');}
   if(action==='publish'){
@@ -860,22 +894,50 @@ function save(action){
 document.getElementById('saveDraftButton').addEventListener('click',function(){save('save_draft').catch(function(){});});
 document.getElementById('publishButton').addEventListener('click',function(){if(window.confirm('Publikasikan perubahan ini ke website publik?'))save('publish').catch(function(){});});
 function makeSlug(value){return String(value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,120);}
-var titleInput=document.getElementById('newTitle');var slugInput=document.getElementById('newSlug');var slugTouched=false;
+var titleInput=document.getElementById('newPageTitleDialog');
+var slugInput=document.getElementById('newPageSlugDialog');
+var newPageDialog=document.getElementById('newPageDialog');
+var newPageError=document.getElementById('newPageDialogError');
+var slugTouched=false;
+function openNewPageDialog(){
+ newPageDialog.hidden=false;newPageError.textContent='';titleInput.focus();
+}
+function closeNewPageDialog(){newPageDialog.hidden=true;newPageError.textContent='';}
 titleInput.addEventListener('input',function(){if(!slugTouched)slugInput.value=makeSlug(titleInput.value);});
 slugInput.addEventListener('input',function(){slugTouched=true;slugInput.value=makeSlug(slugInput.value);});
 function createPage(){
  var title=titleInput.value.trim();var slug=makeSlug(slugInput.value);
- if(!title||!slug){setStatus('Isi nama dan alamat halaman.','error');return;}
+ if(!title||!slug){newPageError.textContent='Isi nama dan alamat halaman terlebih dahulu.';return;}
+ if(pageDirty&&!window.confirm('Perubahan halaman saat ini belum disimpan. Tetap buat halaman baru?'))return;
+ pageDirty=false;
  var fd=new FormData();fd.append('csrf_token',csrf);fd.append('action','create_page');fd.append('new_title',title);fd.append('new_slug',slug);
- var button=document.getElementById('createPageButton');button.disabled=true;setStatus('Membuat halaman…','');
+ var button=document.getElementById('createPageDialogButton');button.disabled=true;newPageError.textContent='Membuat halaman…';setStatus('Membuat halaman…','');
  fetch('/builder/',{method:'POST',credentials:'same-origin',body:fd,headers:{'Accept':'application/json'}})
  .then(function(resp){return resp.json().then(function(data){if(!resp.ok||!data.ok)throw new Error(data.message||'Halaman gagal dibuat.');return data;});})
  .then(function(data){window.location.href=data.url;})
- .catch(function(err){setStatus(err.message||'Halaman gagal dibuat.','error');})
+ .catch(function(err){newPageError.textContent=err.message||'Halaman gagal dibuat.';setStatus(err.message||'Halaman gagal dibuat.','error');})
  .finally(function(){button.disabled=false;});
 }
-document.getElementById('createPageButton').addEventListener('click',createPage);
-document.getElementById('newPageButton').addEventListener('click',function(){titleInput.focus();titleInput.scrollIntoView({behavior:'smooth',block:'center'});});
+document.getElementById('createPageDialogButton').addEventListener('click',createPage);
+document.getElementById('newPageButton').addEventListener('click',openNewPageDialog);
+document.getElementById('closeNewPageButton').addEventListener('click',closeNewPageDialog);
+document.getElementById('cancelNewPageButton').addEventListener('click',closeNewPageDialog);
+newPageDialog.addEventListener('click',function(ev){if(ev.target===newPageDialog)closeNewPageDialog();});
+document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&!newPageDialog.hidden)closeNewPageDialog();});
+window.addEventListener('beforeunload',function(ev){
+ if(pageDirty){
+  ev.preventDefault();
+  ev.returnValue='';
+ }
+});
+document.addEventListener('keydown',function(ev){
+ if((ev.ctrlKey||ev.metaKey)&&String(ev.key).toLowerCase()==='s'){
+  var settingsModal=document.querySelector('.cg-settings-overlay');
+  if(settingsModal&&settingsModal.style.display!=='none')return;
+  ev.preventDefault();
+  save('save_draft').catch(function(){});
+ }
+});
 fillPageSelect();
 if(frame.contentDocument&&frame.contentDocument.readyState==='complete'){try{decorateMain();}catch(e){}}
 })();
