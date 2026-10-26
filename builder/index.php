@@ -724,7 +724,7 @@ function decorateMain(){
   var after=ev.clientY>rect.top+rect.height/2;
   target.parentNode.insertBefore(dragBlock,after?target.nextSibling:target);
  });
- currentMain.addEventListener('drop',function(ev){if(dragBlock){ev.preventDefault();dragBlock=null;decorateBlocks();setStatus('Urutan bagian berubah; simpan draft untuk menyimpan.','');}});
+ currentMain.addEventListener('drop',function(ev){if(dragBlock){ev.preventDefault();dragBlock=null;pageDirty=true;decorateBlocks();setStatus('Urutan bagian berubah; simpan draft untuk menyimpan.','');}});
  currentMain.addEventListener('dragend',function(){dragBlock=null;decorateBlocks();});
  // Avoid navigating to live links and prevent submitting forms inside the editable preview.
  currentMain.querySelectorAll('form').forEach(function(form){form.addEventListener('submit',function(ev){ev.preventDefault();});});
@@ -735,7 +735,7 @@ function decorateMain(){
 frame.addEventListener('load',function(){
  try{decorateMain();}catch(e){setStatus('Gagal menyiapkan kanvas: '+e.message,'error');}
 });
-document.getElementById('pageSelect').addEventListener('change',function(){if(pageDirty&&!window.confirm('Ada perubahan halaman yang belum disimpan. Tetap pindah halaman? Perubahan ini akan ditinggalkan.')){this.value=pageSlug;return;}window.location.href='/builder/?page='+encodeURIComponent(this.value);});
+document.getElementById('pageSelect').addEventListener('change',function(){if(pageDirty&&!window.confirm('Ada perubahan halaman yang belum disimpan. Tetap pindah halaman? Perubahan ini akan ditinggalkan.')){this.value=pageSlug;return;}pageDirty=false;window.location.href='/builder/?page='+encodeURIComponent(this.value);});
 document.querySelectorAll('[data-device]').forEach(function(button){
  button.addEventListener('click',function(){
   document.querySelectorAll('[data-device]').forEach(function(b){b.classList.toggle('active',b===button);});
@@ -909,6 +909,7 @@ function createPage(){
  var title=titleInput.value.trim();var slug=makeSlug(slugInput.value);
  if(!title||!slug){newPageError.textContent='Isi nama dan alamat halaman terlebih dahulu.';return;}
  if(pageDirty&&!window.confirm('Perubahan halaman saat ini belum disimpan. Tetap buat halaman baru?'))return;
+ pageDirty=false;
  var fd=new FormData();fd.append('csrf_token',csrf);fd.append('action','create_page');fd.append('new_title',title);fd.append('new_slug',slug);
  var button=document.getElementById('createPageDialogButton');button.disabled=true;newPageError.textContent='Membuat halaman…';setStatus('Membuat halaman…','');
  fetch('/builder/',{method:'POST',credentials:'same-origin',body:fd,headers:{'Accept':'application/json'}})
