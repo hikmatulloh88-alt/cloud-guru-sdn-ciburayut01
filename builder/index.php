@@ -504,7 +504,7 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
       <button class="device-button" data-device="mobile">📱 Mobile</button>
       <span id="draftLabel" class="status"></span>
     </div>
-    <div class="canvas-wrap"><iframe id="siteFrame" title="Pratinjau halaman yang dapat diedit" src="<?=cgvb_e($config['publishedUrl'])?>&cgvisual=1" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe></div>
+    <div class="canvas-wrap"><iframe id="siteFrame" title="Pratinjau halaman yang dapat diedit" src="<?=cgvb_e($config['publishedUrl'])?>&cgvisual=1" sandbox="allow-same-origin allow-forms allow-popups"></iframe></div>
     <div class="bottom-status"><span>Draft disimpan terpisah dari website publik hingga dipublikasikan.</span><span>Perubahan teks otomatis mengikuti kanvas.</span></div>
   </section>
   <aside class="panel right-panel">
@@ -635,6 +635,13 @@ function decorateMain(){
  currentMain.contentEditable='true';
  currentMain.setAttribute('spellcheck','true');
  currentMain.querySelectorAll('input,textarea,select,button,form').forEach(function(el){el.contentEditable='false';});
+ if(pageSlug==='home'){
+  var schoolNameHeading=currentMain.querySelector('.digital-hero h1');
+  if(schoolNameHeading){schoolNameHeading.contentEditable='false';schoolNameHeading.title='Nama sekolah diubah melalui tab Identitas.';}
+  var liveStats=currentMain.querySelector('.school-live-stats');
+  if(liveStats){liveStats.contentEditable='false';liveStats.title='Statistik ini diperbarui otomatis dari data sekolah.';}
+  currentMain.querySelectorAll('.digital-chips').forEach(function(el){el.contentEditable='false';el.title='Label ini berasal dari tema beranda.';});
+ }
  currentMain.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(ev){ev.preventDefault();},true);});
  currentMain.addEventListener('click',function(ev){
   if(ev.target.closest('a'))ev.preventDefault();
