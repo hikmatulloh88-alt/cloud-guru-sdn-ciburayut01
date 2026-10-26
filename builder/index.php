@@ -881,11 +881,13 @@ function averageImageLuminance(url){
 }
 function isVisualSectionLabel(el){
  if(!el||!el.matches('.eyebrow'))return false;
- var label=(el.textContent||'').replace(/\\s+/g,' ').trim().toLocaleUpperCase('id-ID');
+ var label=(el.textContent||'').replace(/\s+/g,' ').trim().toLocaleUpperCase('id-ID');
  return ['PROFIL SEKOLAH','VISI','MISI','SEJARAH','TUJUAN','PROGRAM SEKOLAH','KEGIATAN SEKOLAH','GALERI SEKOLAH','INFORMASI SEKOLAH','KONTAK SEKOLAH'].indexOf(label)!==-1;
 }
 function groupHeadingWithItsContent(element){
  if(!element||element.closest('.digital-hero,.school-live-stats'))return element;
+ var existingPhotoSection=element.closest('.cg-vb-photo-bg');
+ if(existingPhotoSection)return existingPhotoSection;
  var isHeading=/^H[1-6]$/.test(element.tagName);
  var isLabel=isVisualSectionLabel(element);
  if(!isHeading&&!isLabel)return element;
@@ -929,7 +931,7 @@ function markReadableInnerCards(element){
   var hasValue=card.querySelector(':scope > span, :scope > p, :scope > small');
   var computed=frame.contentWindow.getComputedStyle(card);
   var bg=String(computed.backgroundColor||'');
-  var match=bg.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)(?:,\\s*([\\d.]+))?\\)/i);
+  var match=bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/i);
   if(!match)return;
   var alpha=match[4]===undefined?1:Number(match[4]);
   if(alpha<0.65)return;
