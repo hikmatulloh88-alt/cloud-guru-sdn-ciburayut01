@@ -535,7 +535,7 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
           <button id="removeBackgroundImageButton" class="btn-outline" disabled>✕ Hapus Foto Latar</button>
           <button id="deleteBlockButton" class="btn-danger">Hapus Bagian</button>
         </div>
-        <p class="tool-help" style="margin:12px 0 0">Untuk halaman Beranda, banner utama tetap terhubung ke pengaturan Hero. Teks dan gambar banner yang diubah di sini akan disimpan ke pengaturan Hero saat dipublikasikan.</p>
+        <p class="tool-help" style="margin:12px 0 0"><b>Foto per bagian:</b> klik label VISI, MISI, SEJARAH atau judul bagian yang ingin diberi foto, lalu tekan “Pasang / Ganti Foto Latar”. Jika yang dipilih adalah kartu Profil Sekolah secara keseluruhan, foto akan melapisi seluruh kartu. <br><br><b>Beranda:</b> banner utama tetap terhubung ke pengaturan Hero.</p>
       </div>
     </div>
   </aside>
