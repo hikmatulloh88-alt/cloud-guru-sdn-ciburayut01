@@ -609,6 +609,11 @@ function applyHero(hero){
 function decorateMain(){
  var doc=getDoc();
  if(!doc){setStatus('Pratinjau tidak dapat diakses.','error');return;}
+ if(doc.head && !doc.getElementById('cgvb-editor-style')){
+  var editStyle=doc.createElement('style');editStyle.id='cgvb-editor-style';
+  editStyle.textContent='.cg-vb-selected{outline:3px solid #155eef!important;outline-offset:3px!important}.published-wrap [data-cgvb-index]:hover{outline:1px dashed #70a0f5;outline-offset:2px}.published-wrap .cg-visual-section{cursor:move}.published-wrap .cg-visual-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}@media(max-width:620px){.published-wrap .cg-visual-columns{grid-template-columns:1fr!important}}';
+  doc.head.appendChild(editStyle);
+ }
  currentMain=doc.querySelector('.published-wrap');
  if(!currentMain){setStatus('Kontainer halaman publik tidak ditemukan.','error');return;}
  if(CFG.draft){
@@ -687,7 +692,7 @@ function addSection(type){
  if(type==='text')html='<section class="cg-visual-section" style="'+outer+'"><p style="font-size:17px;line-height:1.8;color:#334155">Klik di sini untuk menulis teks halaman.</p></section>';
  if(type==='image')html='<section class="cg-visual-section" style="'+outer+'"><figure style="margin:0"><img src="" alt="Gambar halaman" style="display:block;max-width:100%;height:auto;border-radius:16px"><figcaption>Keterangan gambar</figcaption></figure></section>';
  if(type==='button')html='<section class="cg-visual-section" style="'+outer+'"><a href="/?page=informasi" style="display:inline-flex;padding:12px 18px;border-radius:10px;background:#155eef;color:#fff;text-decoration:none;font-weight:800">Buka informasi</a></section>';
- if(type==='columns')html='<section class="cg-visual-section" style="'+outer+'"><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px"><div><h2>Kolom kiri</h2><p>Isi penjelasan di sini.</p></div><div><h2>Kolom kanan</h2><p>Tambahkan informasi di sini.</p></div></div></section>';
+ if(type==='columns')html='<section class="cg-visual-section" style="'+outer+'"><div class="cg-visual-columns" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px"><div><h2>Kolom kiri</h2><p>Isi penjelasan di sini.</p></div><div><h2>Kolom kanan</h2><p>Tambahkan informasi di sini.</p></div></div></section>';
  if(type==='divider')html='<hr class="cg-visual-section" style="max-width:1100px;margin:34px auto;border:0;border-top:1px solid #d8e0ea">';
  if(type==='spacer')html='<div class="cg-visual-section" style="height:56px" aria-label="Jarak bagian"></div>';
  if(!html)return;
