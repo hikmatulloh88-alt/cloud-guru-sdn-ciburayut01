@@ -531,7 +531,7 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
           <button id="moveUpButton">↑ Naikkan</button>
           <button id="moveDownButton">↓ Turunkan</button>
           <button id="replaceImageButton">🖼 Ganti Gambar</button>
-          <button id="backgroundImageButton">🌄 Foto Latar + Teks Otomatis</button>
+          <button id="backgroundImageButton">🖼 Pasang / Ganti Foto Latar</button>
           <button id="removeBackgroundImageButton" class="btn-outline" disabled>✕ Hapus Foto Latar</button>
           <button id="deleteBlockButton" class="btn-danger">Hapus Bagian</button>
         </div>
@@ -669,7 +669,7 @@ function decorateMain(){
  if(!doc){setStatus('Pratinjau tidak dapat diakses.','error');return;}
  if(doc.head && !doc.getElementById('cgvb-editor-style')){
   var editStyle=doc.createElement('style');editStyle.id='cgvb-editor-style';
-  editStyle.textContent='.cg-vb-selected{outline:3px solid #155eef!important;outline-offset:3px!important}.published-wrap [data-cgvb-index]:hover,.published-wrap [data-cgvb-selectable]:hover{outline:1px dashed #70a0f5;outline-offset:2px}.published-wrap .cg-visual-section{cursor:move}.published-wrap .cg-visual-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.published-wrap .cg-vb-photo-bg{background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;border-radius:18px!important;padding:clamp(22px,4vw,42px)!important;min-height:120px;isolation:isolate}.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h1,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h2,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h3,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h4,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light p,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light li,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light span,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light b,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light strong,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light a:not(.digital-btn):not([style*="background"]){color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.4)!important}.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h1,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h2,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h3,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h4,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark p,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark li,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark span,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark b,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark strong,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark a:not(.digital-btn):not([style*="background"]){color:#102a43!important;text-shadow:0 1px 2px rgba(255,255,255,.25)!important}@media(max-width:620px){.published-wrap .cg-visual-columns{grid-template-columns:1fr!important}}';
+  editStyle.textContent='.cg-vb-selected{outline:3px solid #155eef!important;outline-offset:3px!important}.published-wrap [data-cgvb-index]:hover,.published-wrap [data-cgvb-selectable]:hover{outline:1px dashed #70a0f5;outline-offset:2px}.published-wrap .cg-visual-section{cursor:move}.published-wrap .cg-visual-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.published-wrap .cg-vb-photo-bg{background-image:var(--cg-photo-background)!important;background-color:transparent!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;border-radius:18px!important;padding:clamp(22px,4vw,42px)!important;min-height:120px;isolation:isolate}.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h1,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h2,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h3,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h4,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light p,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light li,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light span,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light b,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light strong,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light a:not(.digital-btn):not([style*="background"]){color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.4)!important}.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h1,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h2,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h3,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h4,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark p,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark li,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark span,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark b,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark strong,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark a:not(.digital-btn):not([style*="background"]){color:#102a43!important;text-shadow:0 1px 2px rgba(255,255,255,.25)!important}@media(max-width:620px){.published-wrap .cg-visual-columns{grid-template-columns:1fr!important}}';
   doc.head.appendChild(editStyle);
  }
  currentMain=doc.querySelector('.published-wrap');
@@ -890,6 +890,16 @@ function groupHeadingWithItsContent(element){
  wrapper.dataset.cgvbSelectable='1';
  return wrapper;
 }
+function promoteImageBlockToBackground(element){
+ if(!element||!element.classList||!element.classList.contains('cg-visual-section'))return;
+ // If this is a standalone picture block, convert it into a background instead of layering
+ // the same image on top of the newly uploaded background.
+ var image=element.querySelector('figure > img, img');
+ if(!image)return;
+ var figure=image.closest('figure');
+ image.remove();
+ if(figure && !figure.querySelector('img') && !figure.textContent.trim())figure.remove();
+}
 function applyPhotoBackground(element,url){
  if(!element||!url)return Promise.reject(new Error('Pilih bagian halaman terlebih dahulu.'));
  element=groupHeadingWithItsContent(element);
@@ -905,21 +915,27 @@ function applyPhotoBackground(element,url){
     backgroundRepeat:element.style.backgroundRepeat||''
    };
   }
+  promoteImageBlockToBackground(element);
   element.classList.add('cg-vb-photo-bg');
   element.classList.remove('cg-vb-contrast-light','cg-vb-contrast-dark');
   var safeUrl=url.replace(/["\\\\)]/g,'');
+  var backgroundValue;
   if(luminance>=145){
    // Bright photo: soften it with a light veil and use dark, readable text.
    element.classList.add('cg-vb-contrast-dark');
-   element.style.backgroundImage='linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,.56)), url("'+safeUrl+'")';
+   backgroundValue='linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,.56)), url("'+safeUrl+'")';
   }else{
    // Dark photo: add a dark veil and use light, readable text.
    element.classList.add('cg-vb-contrast-light');
-   element.style.backgroundImage='linear-gradient(135deg, rgba(3,15,31,.74), rgba(3,15,31,.42)), url("'+safeUrl+'")';
+   backgroundValue='linear-gradient(135deg, rgba(3,15,31,.74), rgba(3,15,31,.42)), url("'+safeUrl+'")';
   }
-  element.style.backgroundSize='cover';
-  element.style.backgroundPosition='center';
-  element.style.backgroundRepeat='no-repeat';
+  // Force the photo to win against existing theme/card backgrounds.
+  element.style.setProperty('background-image',backgroundValue,'important');
+  element.style.setProperty('background-size','cover','important');
+  element.style.setProperty('background-position','center','important');
+  element.style.setProperty('background-repeat','no-repeat','important');
+  element.style.setProperty('background-color','transparent','important');
+  element.style.setProperty('color',luminance>=145?'#102a43':'#ffffff','important');
   element.scrollIntoView({behavior:'smooth',block:'center'});
  });
 }
@@ -927,10 +943,16 @@ function removePhotoBackground(element){
  if(!element||!element.classList.contains('cg-vb-photo-bg'))return;
  element.classList.remove('cg-vb-photo-bg','cg-vb-contrast-light','cg-vb-contrast-dark');
  var previous=element._cgVbPhotoPrevious||{};
- element.style.backgroundImage=previous.backgroundImage||'';
- element.style.backgroundSize=previous.backgroundSize||'';
- element.style.backgroundPosition=previous.backgroundPosition||'';
- element.style.backgroundRepeat=previous.backgroundRepeat||'';
+ element.style.removeProperty('background-image');
+ element.style.removeProperty('background-size');
+ element.style.removeProperty('background-position');
+ element.style.removeProperty('background-repeat');
+ element.style.removeProperty('background-color');
+ element.style.removeProperty('color');
+ if(previous.backgroundImage)element.style.setProperty('background-image',previous.backgroundImage);
+ if(previous.backgroundSize)element.style.setProperty('background-size',previous.backgroundSize);
+ if(previous.backgroundPosition)element.style.setProperty('background-position',previous.backgroundPosition);
+ if(previous.backgroundRepeat)element.style.setProperty('background-repeat',previous.backgroundRepeat);
  delete element._cgVbPhotoPrevious;
  pageDirty=true;
  setStatus('Foto latar dihapus. Klik Simpan Draft untuk menyimpan.','success');
