@@ -44,3 +44,4 @@ deployment:
     - /bin/cp builder/index.php $DEPLOYPATH/builder/index.php
     - if [ -f "$DEPLOYPATH/admin/tampilan/index.php" ]; then /usr/bin/perl -0pi -e 's{<a\b(?:(?!</a>).)*Buka Website Builder(?:(?!</a>).)*</a>}{}is' "$DEPLOYPATH/admin/tampilan/index.php"; fi
     - if [ -f "$DEPLOYPATH/admin/tampilan/index.php" ]; then /usr/bin/perl -0pi -e 's{</body>}{<script src="/assets/js/page-image-upload.js" defer></script></body>}i unless /page-image-upload\.js/' "$DEPLOYPATH/admin/tampilan/index.php"; fi
+    - if [ -f "$DEPLOYPATH/admin/tampilan/index.php" ]; then /usr/bin/perl -0pi -e 's{(<a\\b(?:(?!</a>).)*Buka Website Publik(?:(?!</a>).)*</a>)}{$1<a href="/builder/" style="text-decoration:none;padding:10px 12px;border:1px solid #dce4ef;border-radius:9px;font-weight:750;color:#24364c;background:#fff">🧱 Editor Visual</a>}is unless /Editor Visual/' "$DEPLOYPATH/admin/tampilan/index.php"; fi
