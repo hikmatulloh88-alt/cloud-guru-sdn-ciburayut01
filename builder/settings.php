@@ -192,6 +192,20 @@ foreach ($incoming as $key => $value) {
     if (in_array($key, $validUrlKeys, true) && !cgvs_valid_url($value, in_array($key, ['seo_canonical'], true))) {
         cgvs_json(400, ['ok'=>false,'message'=>'URL tidak valid pada pengaturan ' . $key . '.']);
     }
+    if ($key === 'footer_quicklinks' && $value !== '') {
+        $lines = preg_split('/\r\n|\r|\n/', $value) ?: [];
+        if (count($lines) > 20) cgvs_json(400, ['ok'=>false,'message'=>'Footer maksimal 20 tautan.']);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') continue;
+            $parts = explode('|', $line, 2);
+            $label = trim((string)($parts[0] ?? ''));
+            $url = trim((string)($parts[1] ?? ''));
+            if ($label === '' || $url === '' || mb_strlen($label, 'UTF-8') > 80 || strlen($url) > 400 || !cgvs_valid_url($url, true)) {
+                cgvs_json(400, ['ok'=>false,'message'=>'Format footer tidak valid. Gunakan Label|URL pada setiap baris.']);
+            }
+        }
+    }
     if (in_array($key, $colorKeys, true) && $value !== '' && !preg_match('/^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/', $value)) {
         cgvs_json(400, ['ok'=>false,'message'=>'Warna harus menggunakan format HEX, misalnya #155eef.']);
     }
