@@ -89,6 +89,14 @@ function cgvs_columns(PDO $pdo): array {
     foreach ($q ?: [] as $row) $cols[(string)$row['Field']] = true;
     return $cols;
 }
+function cgvs_ensure_drafts(PDO $pdo): void {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS website_builder_visual_settings_drafts (
+        setting_key VARCHAR(100) NOT NULL PRIMARY KEY,
+        setting_value TEXT NOT NULL,
+        updated_by INT NULL,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
 function cgvs_valid_url(string $value, bool $allowMailTel = false): bool {
     $value = trim($value);
     if ($value === '') return true;
@@ -120,6 +128,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
     } catch (Throwable $e) {
         error_log('Cloud Guru visual settings read: ' . $e->getMessage());
         cgvs_json(500, ['ok'=>false,'message'=>'Pengaturan tidak dapat dimuat.']);
+    }
+    try {
+        cgvs_ensure_drafts($pdo);
+        $draftRows = $pdo->query('SELECT setting_key, setting_value FROM website_builder_visual_settings_drafts')->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($draftRows as $draftRow) {
+            $draftKey = (string)($draftRow['setting_key'] ?? '');
+            if (array_key_exists($draftKey, $defaults)) $values[$draftKey] = (string)($draftRow['setting_value'] ?? '');
+        }
+    } catch (Throwable $e) {
+        error_log('Cloud Guru visual settings draft read: ' . $e->getMessage());
     }
     $navItems = json_decode((string)$values['navbar_items'], true);
     if (!is_array($navItems)) $navItems = json_decode($defaults['navbar_items'], true) ?: [];
@@ -155,6 +173,9 @@ if (isset($incoming['navbar_items_text']) && is_string($incoming['navbar_items_t
     $incoming['navbar_items'] = json_encode($items, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     unset($incoming['navbar_items_text']);
 }
+$action = (string)($_POST['action'] ?? 'save_draft');
+if (!in_array($action, ['save_draft','publish'], true)) cgvs_json(400, ['ok'=>false,'message'=>'Aksi pengaturan tidak valid.']);
+
 $validUrlKeys = [
     'logo_url','favicon_url','hero_image','hero_button_url','hero_button2_url','navbar_cta_url',
     'facebook_url','instagram_url','youtube_url','maps_embed_url','maps_link','seo_og_image','seo_canonical'
@@ -189,17 +210,35 @@ foreach ($incoming as $key => $value) {
 }
 if (!$values) cgvs_json(400, ['ok'=>false,'message'=>'Tidak ada pengaturan yang bisa disimpan.']);
 try {
+    cgvs_ensure_drafts($pdo);
     $pdo->beginTransaction();
-    $exists = $pdo->prepare('SELECT 1 FROM website_builder_settings WHERE setting_key=? LIMIT 1');
-    $update = $pdo->prepare('UPDATE website_builder_settings SET setting_value=? WHERE setting_key=?');
-    $insert = $pdo->prepare('INSERT INTO website_builder_settings (setting_key, setting_value) VALUES (?,?)');
+    $draftExists = $pdo->prepare('SELECT 1 FROM website_builder_visual_settings_drafts WHERE setting_key=? LIMIT 1');
+    $draftUpdate = $pdo->prepare('UPDATE website_builder_visual_settings_drafts SET setting_value=?, updated_by=? WHERE setting_key=?');
+    $draftInsert = $pdo->prepare('INSERT INTO website_builder_visual_settings_drafts (setting_key, setting_value, updated_by) VALUES (?,?,?)');
     foreach ($values as $key => $value) {
-        $exists->execute([$key]);
-        if ($exists->fetchColumn()) $update->execute([$value, $key]);
-        else $insert->execute([$key, $value]);
+        $draftExists->execute([$key]);
+        if ($draftExists->fetchColumn()) $draftUpdate->execute([$value, (int)($_SESSION['user_id'] ?? 0), $key]);
+        else $draftInsert->execute([$key, $value, (int)($_SESSION['user_id'] ?? 0)]);
+    }
+    if ($action === 'publish') {
+        $exists = $pdo->prepare('SELECT 1 FROM website_builder_settings WHERE setting_key=? LIMIT 1');
+        $update = $pdo->prepare('UPDATE website_builder_settings SET setting_value=? WHERE setting_key=?');
+        $insert = $pdo->prepare('INSERT INTO website_builder_settings (setting_key, setting_value) VALUES (?,?)');
+        foreach ($values as $key => $value) {
+            $exists->execute([$key]);
+            if ($exists->fetchColumn()) $update->execute([$value, $key]);
+            else $insert->execute([$key, $value]);
+        }
+        $delete = $pdo->prepare('DELETE FROM website_builder_visual_settings_drafts WHERE setting_key=?');
+        foreach (array_keys($values) as $key) $delete->execute([$key]);
     }
     $pdo->commit();
-    cgvs_json(200, ['ok'=>true,'message'=>'Pengaturan website berhasil disimpan.','updated_keys'=>array_keys($values)]);
+    cgvs_json(200, [
+        'ok'=>true,
+        'message'=>$action === 'publish' ? 'Pengaturan tersimpan dan dipublikasikan.' : 'Draft pengaturan berhasil disimpan; website publik belum berubah.',
+        'action'=>$action,
+        'updated_keys'=>array_keys($values)
+    ]);
 } catch (Throwable $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
     error_log('Cloud Guru visual settings save: ' . $e->getMessage());
