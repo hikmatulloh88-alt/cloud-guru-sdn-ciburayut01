@@ -19,6 +19,14 @@ $settings += [
     'hero_button_url' => '/?page=informasi',
     'hero_button2_text' => 'Profil Sekolah',
     'hero_button2_url' => '/?page=profil',
+    'footer_quicklinks' => "Beranda|/?page=home\\nProfil Sekolah|/?page=profil\\nInformasi|/?page=informasi\\nProfil Guru|/?page=guru\\nGaleri|/?page=galeri",
+    'footer_bg' => '#102a43',
+    'footer_layout' => 'columns',
+    'footer_show_contact' => '1',
+    'footer_show_logo' => '1',
+    'footer_show_quicklinks' => '1',
+    'footer_show_social' => '1',
+    'footer_text_color' => '#ffffff',
 ];
 try{$q=$pdo->query("SELECT setting_key,setting_value FROM website_builder_settings");foreach($q as $r)if(array_key_exists($r['setting_key'],$settings))$settings[$r['setting_key']]=$r['setting_value'];}catch(Throwable $e){}
 
