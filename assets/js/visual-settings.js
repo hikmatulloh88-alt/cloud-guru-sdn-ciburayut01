@@ -227,7 +227,7 @@ function specialHtml(id){
   });box.appendChild(row);
  }
  if(id==='media'||id==='homeimages'){
-  var note=id==='media'?'Pilih tujuan gambar. Setelah upload berhasil, URL akan masuk ke pengaturan yang dipilih.':'Pilih Beranda pada dropdown halaman sebelum memilih “Tambahkan sebagai blok gambar”. Untuk banner utama, pilih “Hero Beranda”.';
+  var note=id==='media'?'Pilih tujuan gambar. Setelah upload berhasil, URL akan masuk ke pengaturan yang dipilih.':'Secara default, foto yang diunggah akan langsung ditambahkan sebagai blok gambar pada kanvas halaman yang sedang terbuka. Untuk mengganti banner utama, pilih “Hero Beranda”.';
   box.appendChild(el('div',{class:'cg-settings-note',text:note}));
   var uploadBox=el('div',{class:'cg-settings-upload'});
   uploadBox.appendChild(el('label',{class:'cg-settings-label',text:'Pasang gambar sebagai'}));
@@ -239,7 +239,7 @@ function specialHtml(id){
    ['seo_og_image','Gambar pratinjau saat dibagikan'],
    ['page-block','Tambahkan sebagai blok gambar di kanvas']
   ].forEach(function(op){target.appendChild(el('option',{value:op[0],text:op[1]}));});
-  target.value=id==='homeimages'?'hero_image':'hero_image';
+  target.value=id==='homeimages'?'page-block':'hero_image';
   target.addEventListener('change',function(){uploadTarget=target.value;});
   uploadBox.appendChild(target);
   var file=el('input',{id:'cg-settings-upload-file',type:'file',accept:'image/jpeg,image/png,image/webp,image/gif'});
@@ -349,7 +349,15 @@ function uploadSettingImage(fileInput,target,button){
  if(uploadStatus){uploadStatus.textContent='Sedang mengunggah gambar…';uploadStatus.dataset.kind='';}
  var form=new FormData();form.append('csrf_token',csrf);form.append('image',file,file.name);
  fetch('/admin/tampilan/upload_page_image.php',{method:'POST',credentials:'same-origin',body:form,headers:{'Accept':'application/json'}})
- .then(function(r){return r.json().then(function(d){if(!r.ok||!d.ok)throw new Error(d.message||'Upload gambar gagal.');return d;});})
+ .then(function(r){return r.text().then(function(text){
+   var d;
+   try{d=JSON.parse(text);}catch(parseError){
+    if(r.redirected||/<html|<!doctype/i.test(text))throw new Error('Sesi login tidak terbaca. Muat ulang Editor Visual lalu login kembali bila diminta.');
+    throw new Error('Server gagal memproses upload (HTTP '+r.status+'). Coba gambar yang lebih kecil atau periksa izin folder upload di hosting.');
+   }
+   if(!r.ok||!d.ok)throw new Error(d.message||'Upload gambar gagal (HTTP '+r.status+').');
+   return d;
+  });})
  .then(function(d){
   if(target==='page-block'){
    if(typeof window.CGVisualBuilderAddImage==='function')window.CGVisualBuilderAddImage(d.url,file.name);
@@ -363,11 +371,18 @@ function uploadSettingImage(fileInput,target,button){
   if(preview){preview.src=d.url;preview.style.display='block';}
   if(uploadStatus){
    uploadStatus.textContent=target==='page-block'
-    ? '✓ Gambar masuk ke kanvas. Tutup panel ini, lalu klik Simpan Draft pada toolbar Editor Visual untuk menyimpan halaman.'
+    ? '✓ Gambar sudah ditempatkan di kanvas. Draft belum disimpan.'
     : '✓ '+d.message+' Klik Simpan Draft Pengaturan atau Simpan & Publikasikan.';
    uploadStatus.dataset.kind='success';
   }
-  setStatus(target==='page-block'?'Gambar ditambahkan ke kanvas; simpan draft halaman dari toolbar.':'Gambar diunggah. Perubahan URL belum dipublikasikan.','success');
+  setStatus(target==='page-block'?'Gambar sudah ditempatkan di kanvas.':'Gambar diunggah. Perubahan URL belum dipublikasikan.','success');
+  if(target==='page-block'){
+   var editorStatus=document.getElementById('status');
+   if(editorStatus){editorStatus.textContent='✓ Foto sudah masuk ke kanvas. Klik Simpan Draft untuk menyimpannya.';editorStatus.dataset.kind='success';}
+   // Close the settings window after insertion so the administrator can see the image immediately.
+   // Keep the window open if other setting values have unsaved edits.
+   if(!dirty&&modal)modal.style.display='none';
+  }
  })
  .catch(function(e){if(uploadStatus){uploadStatus.textContent=e.message||'Upload gagal.';uploadStatus.dataset.kind='error';}setStatus(e.message||'Upload gagal.','error');})
  .finally(function(){if(button)button.disabled=false;});
