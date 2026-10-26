@@ -68,7 +68,7 @@ function cgvs_allowed_settings(): array {
         'footer_text' => '© ' . date('Y') . ' SDN Ciburayut 01. Semua hak dilindungi.',
         'footer_quicklinks' => "Beranda|/?page=home\nProfil Sekolah|/?page=profil\nInformasi|/?page=informasi\nProfil Guru|/?page=guru\nGaleri|/?page=galeri",
         'footer_bg' => '#102a43',
-        'footer_layout' => 'columns',
+        'footer_layout' => '3',
         'footer_show_contact' => '1',
         'footer_show_logo' => '1',
         'footer_show_quicklinks' => '1',
@@ -215,7 +215,7 @@ foreach ($incoming as $key => $value) {
     }
     if ($key === 'navbar_style' && !in_array($value, ['glass','solid','minimal','transparent'], true)) $value = 'glass';
     if ($key === 'header_align' && !in_array($value, ['between','left','center','right'], true)) $value = 'between';
-    if ($key === 'footer_layout' && !in_array($value, ['columns','stacked','centered'], true)) $value = 'columns';
+    if ($key === 'footer_layout' && !in_array($value, ['2','3','4'], true)) $value = '3';
     if ($key === 'seo_robots' && !in_array($value, ['index,follow','noindex,follow','index,nofollow','noindex,nofollow'], true)) $value = 'index,follow';
     if (in_array($key, ['site_name','tagline','hero_eyebrow','hero_title','hero_subtitle','hero_button_text','hero_button2_text','navbar_cta_text','footer_text','seo_title','seo_description','seo_keywords','seo_author'], true) && mb_strlen($value, 'UTF-8') > 500) {
         cgvs_json(400, ['ok'=>false,'message'=>'Teks terlalu panjang: ' . $key]);
