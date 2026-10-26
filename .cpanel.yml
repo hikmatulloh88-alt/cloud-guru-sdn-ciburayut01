@@ -31,6 +31,7 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/assets/css
     - /bin/mkdir -p $DEPLOYPATH/assets/js
     - /bin/cp assets/js/page-image-upload.js $DEPLOYPATH/assets/js/page-image-upload.js
+    - /bin/cp assets/js/visual-settings.js $DEPLOYPATH/assets/js/visual-settings.js
     - /bin/cp assets/css/cloud-guru-public-overrides.css $DEPLOYPATH/assets/css/cloud-guru-public-overrides.css
     - /bin/cp index.php $DEPLOYPATH/index.php
     - /bin/mkdir -p $DEPLOYPATH/storage
@@ -42,6 +43,7 @@ deployment:
     - /bin/mkdir -p $DEPLOYPATH/auth
     - /bin/mkdir -p $DEPLOYPATH/builder
     - /bin/cp builder/index.php $DEPLOYPATH/builder/index.php
+    - /bin/cp builder/settings.php $DEPLOYPATH/builder/settings.php
     - if [ -f "$DEPLOYPATH/admin/tampilan/index.php" ]; then /usr/bin/perl -0pi -e 's{<a\b(?:(?!</a>).)*Buka Website Builder(?:(?!</a>).)*</a>}{}is' "$DEPLOYPATH/admin/tampilan/index.php"; fi
     - if [ -f "$DEPLOYPATH/admin/tampilan/index.php" ]; then /usr/bin/perl -0pi -e 's{</body>}{<script src="/assets/js/page-image-upload.js" defer></script></body>}i unless /page-image-upload\.js/' "$DEPLOYPATH/admin/tampilan/index.php"; fi
     - if [ -f "$DEPLOYPATH/admin/tampilan/index.php" ]; then /usr/bin/perl -0pi -e 's{(<a\b(?:(?!</a>).)*Buka Website Publik(?:(?!</a>).)*</a>)}{$1<a href="/builder/" style="display:inline-block;padding:10px 12px;border:1px solid lightgray;border-radius:9px;font-weight:750;color:navy;background:white">🧱 Editor Visual</a>}is unless /Editor Visual/' "$DEPLOYPATH/admin/tampilan/index.php"; fi
