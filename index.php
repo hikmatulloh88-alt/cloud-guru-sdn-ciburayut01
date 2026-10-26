@@ -19,7 +19,7 @@ $settings += [
     'hero_button_url' => '/?page=informasi',
     'hero_button2_text' => 'Profil Sekolah',
     'hero_button2_url' => '/?page=profil',
-    'footer_quicklinks' => "Beranda|/?page=home\\nProfil Sekolah|/?page=profil\\nInformasi|/?page=informasi\\nProfil Guru|/?page=guru\\nGaleri|/?page=galeri",
+    'footer_quicklinks' => implode("\n", ['Beranda|/?page=home','Profil Sekolah|/?page=profil','Informasi|/?page=informasi','Profil Guru|/?page=guru','Galeri|/?page=galeri']),
     'footer_bg' => '#102a43',
     'footer_layout' => 'columns',
     'footer_show_contact' => '1',
