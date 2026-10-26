@@ -149,7 +149,7 @@ function createModal(){
  renderTabs();
 }
 function setStatus(message,kind){if(!status)return;status.textContent=message;status.dataset.kind=kind||'';}
-function closeModal(){if(modal)modal.style.display='none';}
+function closeModal(){if(dirty&&!window.confirm('Ada perubahan pengaturan yang belum disimpan sebagai draft. Tutup tanpa menyimpannya?'))return false;if(modal)modal.style.display='none';return true;}
 function renderTabs(){
  tabList.textContent='';
  categories.forEach(function(cat){
@@ -243,7 +243,7 @@ function specialHtml(id){
   var row=el('div',{class:'cg-settings-actions-grid'});
   [['heading','＋ Judul'],['text','¶ Teks'],['image','▧ Gambar'],['button','↗ Tombol / Tautan'],['columns','▥ Dua Kolom'],['divider','― Garis Pemisah'],['spacer','↕ Jarak']].forEach(function(pair){
    var b=el('button',{type:'button',text:pair[1]});
-   b.addEventListener('click',function(){closeModal();var existing=document.querySelector('[data-insert="'+pair[0]+'"]');if(existing)existing.click();});
+   b.addEventListener('click',function(){if(!closeModal())return;var existing=document.querySelector('[data-insert="'+pair[0]+'"]');if(existing)existing.click();});
    row.appendChild(b);
   });
   box.appendChild(row);
