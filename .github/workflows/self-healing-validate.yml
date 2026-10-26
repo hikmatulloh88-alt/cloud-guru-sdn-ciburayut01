@@ -61,6 +61,27 @@ jobs:
             exit 1
           fi
 
+  javascript-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JavaScript syntax check
+        run: |
+          node --check assets/js/page-image-upload.js
+          node --check assets/js/visual-settings.js
+
+  cpanel-yaml-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate cPanel deployment YAML
+        run: |
+          ruby -e 'require "yaml"; data = YAML.load_file(".cpanel.yml"); abort("Invalid cPanel deployment task list") unless data.dig("deployment", "tasks").is_a?(Array) && !data.dig("deployment", "tasks").empty?'
+
   patch-engine-safe-test:
     runs-on: ubuntu-latest
     steps:
