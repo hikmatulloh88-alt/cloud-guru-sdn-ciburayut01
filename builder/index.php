@@ -871,8 +871,31 @@ function averageImageLuminance(url){
   image.src=url;
  });
 }
+function groupHeadingWithItsContent(element){
+ if(!element||!/^H[2-6]$/.test(element.tagName)||element.closest('.cg-vb-photo-bg'))return element;
+ var level=parseInt(element.tagName.substring(1),10);
+ var parent=element.parentElement;
+ if(!parent)return element;
+ var wrapper=element.ownerDocument.createElement('section');
+ wrapper.className='cg-vb-photo-section';
+ wrapper.style.margin='24px 0';
+ parent.insertBefore(wrapper,element);
+ var node=element;
+ while(node){
+  if(node!==element&&/^H[1-6]$/.test(node.tagName)&&parseInt(node.tagName.substring(1),10)<=level)break;
+  var next=node.nextElementSibling;
+  wrapper.appendChild(node);
+  node=next;
+ }
+ wrapper.dataset.cgvbSelectable='1';
+ return wrapper;
+}
 function applyPhotoBackground(element,url){
  if(!element||!url)return Promise.reject(new Error('Pilih bagian halaman terlebih dahulu.'));
+ element=groupHeadingWithItsContent(element);
+ selectedBlock=element;
+ if(element.dataset)element.dataset.cgvbSelectable='1';
+ selectBlock(element);
  return averageImageLuminance(url).then(function(luminance){
   if(!element.classList.contains('cg-vb-photo-bg')){
    element.dataset.cgPhotoPreviousBackground=element.style.backgroundImage||'';
