@@ -898,10 +898,12 @@ function applyPhotoBackground(element,url){
  selectBlock(element);
  return averageImageLuminance(url).then(function(luminance){
   if(!element.classList.contains('cg-vb-photo-bg')){
-   element.dataset.cgPhotoPreviousBackground=element.style.backgroundImage||'';
-   element.dataset.cgPhotoPreviousSize=element.style.backgroundSize||'';
-   element.dataset.cgPhotoPreviousPosition=element.style.backgroundPosition||'';
-   element.dataset.cgPhotoPreviousRepeat=element.style.backgroundRepeat||'';
+   element._cgVbPhotoPrevious={
+    backgroundImage:element.style.backgroundImage||'',
+    backgroundSize:element.style.backgroundSize||'',
+    backgroundPosition:element.style.backgroundPosition||'',
+    backgroundRepeat:element.style.backgroundRepeat||''
+   };
   }
   element.classList.add('cg-vb-photo-bg');
   element.classList.remove('cg-vb-contrast-light','cg-vb-contrast-dark');
@@ -924,14 +926,12 @@ function applyPhotoBackground(element,url){
 function removePhotoBackground(element){
  if(!element||!element.classList.contains('cg-vb-photo-bg'))return;
  element.classList.remove('cg-vb-photo-bg','cg-vb-contrast-light','cg-vb-contrast-dark');
- element.style.backgroundImage=element.dataset.cgPhotoPreviousBackground||'';
- element.style.backgroundSize=element.dataset.cgPhotoPreviousSize||'';
- element.style.backgroundPosition=element.dataset.cgPhotoPreviousPosition||'';
- element.style.backgroundRepeat=element.dataset.cgPhotoPreviousRepeat||'';
- delete element.dataset.cgPhotoPreviousBackground;
- delete element.dataset.cgPhotoPreviousSize;
- delete element.dataset.cgPhotoPreviousPosition;
- delete element.dataset.cgPhotoPreviousRepeat;
+ var previous=element._cgVbPhotoPrevious||{};
+ element.style.backgroundImage=previous.backgroundImage||'';
+ element.style.backgroundSize=previous.backgroundSize||'';
+ element.style.backgroundPosition=previous.backgroundPosition||'';
+ element.style.backgroundRepeat=previous.backgroundRepeat||'';
+ delete element._cgVbPhotoPrevious;
  pageDirty=true;
  setStatus('Foto latar dihapus. Klik Simpan Draft untuk menyimpan.','success');
  document.getElementById('removeBackgroundImageButton').disabled=true;
