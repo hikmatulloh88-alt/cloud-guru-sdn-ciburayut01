@@ -341,6 +341,9 @@ if(!$ogImage)$ogImage=trim((string)($settings['hero_image']??''));
 <meta name="author" content="<?=htmlspecialchars($settings['seo_author']??$settings['site_name'])?>">
 <meta name="robots" content="<?=htmlspecialchars($robots)?>">
 <link rel="canonical" href="<?=htmlspecialchars($canonical)?>">
+<?php $faviconUrl = trim((string)($settings['favicon_url'] ?? '')); if ($faviconUrl !== '' && (preg_match('#^https?://#i', $faviconUrl) || (str_starts_with($faviconUrl, '/') && !str_starts_with($faviconUrl, '//')))): ?>
+<link rel="icon" href="<?=htmlspecialchars($faviconUrl, ENT_QUOTES, 'UTF-8')?>">
+<?php endif; ?>
 <meta property="og:type" content="<?=isset($nr)?'article':'website'?>">
 <meta property="og:title" content="<?=htmlspecialchars($title)?>">
 <meta property="og:description" content="<?=htmlspecialchars($description)?>">
