@@ -796,7 +796,7 @@ window.CGVisualBuilderApplyHeroImage=function(url){
  pageDirty=true;
  setStatus('Foto Hero sudah diperbarui di pratinjau. Simpan atau publikasikan untuk menerapkan perubahan.','success');
 };
-document.querySelectorAll('[data-insert]').forEach(function(button){button.addEventListener('click',function(){if(button.dataset.insert==='image'){document.getElementById('imageFile').click();}else addSection(button.dataset.insert);});});
+document.querySelectorAll('[data-insert]').forEach(function(button){button.addEventListener('click',function(){if(button.dataset.insert==='image'){uploadMode='image';document.getElementById('imageFile').click();}else addSection(button.dataset.insert);});});
 document.getElementById('moveUpButton').addEventListener('click',function(){
  if(!selectedBlock||isProtectedBlock(selectedBlock))return;
  var prev=selectedBlock.previousElementSibling;
