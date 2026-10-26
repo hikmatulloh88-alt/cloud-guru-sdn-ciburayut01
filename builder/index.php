@@ -65,9 +65,10 @@ function cgvb_page_list(PDO $pdo): array {
         $cols = cgvb_page_columns($pdo);
         $slugCol = cgvb_first_col($cols, ['slug', 'page_slug', 'url_slug']);
         $titleCol = cgvb_first_col($cols, ['title', 'judul', 'page_title', 'name']);
-        if (!$slugCol || !$titleCol) return [['slug'=>'home','title'=>'Beranda']];
+        $defaultPages = [['slug'=>'home','title'=>'Beranda'],['slug'=>'profil','title'=>'Profil Sekolah'],['slug'=>'informasi','title'=>'Informasi'],['slug'=>'guru','title'=>'Profil Guru'],['slug'=>'galeri','title'=>'Galeri Sekolah'],['slug'=>'contact','title'=>'Kontak Sekolah']];
+        if (!$slugCol || !$titleCol) return $defaultPages;
         $rows = $pdo->query('SELECT `' . $slugCol . '` AS page_slug, `' . $titleCol . '` AS page_title FROM website_builder_pages ORDER BY ' . (isset($cols['id']) ? 'id' : '`' . $titleCol . '`') . ' ASC')->fetchAll(PDO::FETCH_ASSOC);
-        $pages = [['slug'=>'home','title'=>'Beranda']];
+        $pages = $defaultPages;
         foreach ($rows as $row) {
             $slug = strtolower(trim((string)($row['page_slug'] ?? '')));
             if (!cgvb_valid_slug($slug) || $slug === 'home') continue;
@@ -79,7 +80,7 @@ function cgvb_page_list(PDO $pdo): array {
         return array_values($bySlug);
     } catch (Throwable $e) {
         error_log('Cloud Guru Visual Builder page list: ' . $e->getMessage());
-        return [['slug'=>'home','title'=>'Beranda']];
+        return [['slug'=>'home','title'=>'Beranda'],['slug'=>'profil','title'=>'Profil Sekolah'],['slug'=>'informasi','title'=>'Informasi'],['slug'=>'guru','title'=>'Profil Guru'],['slug'=>'galeri','title'=>'Galeri Sekolah'],['slug'=>'contact','title'=>'Kontak Sekolah']];
     }
 }
 function cgvb_published(PDO $pdo, string $slug): ?string {
@@ -300,7 +301,7 @@ function cgvb_safe_page_payload(PDO $pdo, string $slug, string $title, int $user
         if (!$slugCol || !$titleCol) cgvb_json(500, ['ok'=>false,'message'=>'Struktur tabel halaman tidak cocok. Halaman baru belum dibuat.']);
         $existing = $pdo->prepare('SELECT 1 FROM website_builder_pages WHERE `' . $slugCol . '`=? LIMIT 1');
         $existing->execute([$newSlug]);
-        if ($existing->fetchColumn() || $newSlug === 'home') cgvb_json(409, ['ok'=>false,'message'=>'Alamat halaman sudah dipakai. Pilih slug lain.']);
+        if ($existing->fetchColumn() || in_array($newSlug, ['home','profil','informasi','guru','galeri','contact'], true)) cgvb_json(409, ['ok'=>false,'message'=>'Alamat halaman sudah dipakai oleh halaman bawaan atau halaman lain. Pilih slug lain.']);
         $values = [$slugCol=>$newSlug, $titleCol=>$newTitle];
         foreach ($cols as $name => $meta) {
             if (isset($values[$name]) || $meta['Default'] !== null || $meta['Null'] === 'YES' || strpos((string)$meta['Extra'],'auto_increment') !== false) continue;
