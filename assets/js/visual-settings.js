@@ -9,6 +9,7 @@ var activeGroup = 'identitas';
 var dirty = false;
 var loading = false;
 var uploadTarget = 'hero_image';
+var globalFileInput = null;
 var categories = [
  {id:'identitas',label:'🏫 Identitas',title:'Identitas Website',desc:'Nama sekolah, tagline, logo, dan favicon yang dipakai di website publik.',fields:[
   {key:'site_name',label:'Nama sekolah',type:'text',required:true},
@@ -114,6 +115,7 @@ function injectStyle(){
 }
 function createModal(){
  modal=el('div',{class:'cg-settings-overlay',role:'dialog','aria-modal':'true','aria-label':'Pengaturan Website'});
+ modal.style.display='flex';
  var dialog=el('div',{class:'cg-settings-dialog'});
  var header=el('div',{class:'cg-settings-header'});
  var titles=el('div',{});
@@ -138,13 +140,16 @@ function createModal(){
  });
  footer.appendChild(status);footer.appendChild(saveBtn);footer.appendChild(publishBtn);
  dialog.appendChild(header);dialog.appendChild(body);dialog.appendChild(footer);modal.appendChild(dialog);
+ globalFileInput=el('input',{type:'file',id:'cg-settings-global-file',accept:'image/jpeg,image/png,image/webp,image/gif',style:'display:none'});
+ globalFileInput.addEventListener('change',function(){if(globalFileInput.files&&globalFileInput.files[0])uploadSettingImage(globalFileInput,uploadTarget,null);});
+ modal.appendChild(globalFileInput);
  modal.addEventListener('click',function(ev){if(ev.target===modal)closeModal();});
  document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&modal&&modal.isConnected)closeModal();});
  document.body.appendChild(modal);
  renderTabs();
 }
 function setStatus(message,kind){if(!status)return;status.textContent=message;status.dataset.kind=kind||'';}
-function closeModal(){if(modal&&modal.parentNode)modal.parentNode.removeChild(modal);}
+function closeModal(){if(modal)modal.style.display='none';}
 function renderTabs(){
  tabList.textContent='';
  categories.forEach(function(cat){
@@ -309,8 +314,8 @@ function saveSettings(action){
 function startUpload(key){
  var target=document.getElementById('cg-settings-upload-target');
  if(target)target.value=key;
- var file=document.getElementById('cg-settings-upload-file');
- if(file){uploadTarget=key;file.click();}
+ uploadTarget=key;
+ if(globalFileInput){globalFileInput.value='';globalFileInput.click();}
 }
 function uploadSettingImage(fileInput,target,button){
  var file=fileInput&&fileInput.files&&fileInput.files[0];
