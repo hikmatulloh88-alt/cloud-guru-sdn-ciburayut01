@@ -40,7 +40,63 @@ $navbar['navbar_enabled']=$navbar['navbar_enabled']==='1'||$navbar['navbar_enabl
 // Final public navigation guard: never render dead # links.
 $navFallback=['Beranda|/?page=home','Profil|/?page=profil','Informasi|/?page=informasi','Guru|/?page=guru','Galeri|/?page=galeri'];
 $cleanNav=[]; foreach((array)$navbar['navbar_items'] as $it){$label=trim((string)($it['label']??''));$url=trim((string)($it['url']??'')); if($label===''||$url===''||$url==='#') continue; if(!preg_match('#^(https?://|/|\?)[^\s]{0,400}$#i',$url)) continue; $cleanNav[]=['label'=>$label,'url'=>$url];}
-if(!$cleanNav){foreach($navFallback as $line){[$label,$url]=explode('|',$line,2);$cleanNav[]=['label'=>$label,'url'=>$url];}} $navbar['navbar_items']=$cleanNav;
+if(!$cleanNav){foreach($navFallback as $line){[$label,$url]=explode('|',$line,2);$cleanNav[]=['label'=>$label,'url'=>$url];}}
+
+/*
+ * Auto-add published pages created in the Visual Editor to the public header.
+ * A row must exist in both page metadata and published content; drafts never appear.
+ */
+$autoPublishedPages = [];
+try {
+    $pageColumns = $pdo->query("SHOW COLUMNS FROM website_builder_pages")->fetchAll(PDO::FETCH_COLUMN, 0);
+    $publishedColumns = $pdo->query("SHOW COLUMNS FROM website_builder_published")->fetchAll(PDO::FETCH_COLUMN, 0);
+    $pageSlugColumn = null;
+    foreach (['slug', 'page_slug', 'url_slug'] as $candidate) {
+        if (in_array($candidate, $pageColumns, true)) { $pageSlugColumn = $candidate; break; }
+    }
+    $pageTitleColumn = null;
+    foreach (['title', 'judul', 'page_title', 'name'] as $candidate) {
+        if (in_array($candidate, $pageColumns, true)) { $pageTitleColumn = $candidate; break; }
+    }
+    $publishedSlugColumn = null;
+    foreach (['page_slug', 'slug'] as $candidate) {
+        if (in_array($candidate, $publishedColumns, true)) { $publishedSlugColumn = $candidate; break; }
+    }
+    if ($pageSlugColumn && $pageTitleColumn && $publishedSlugColumn) {
+        $orderBy = in_array('id', $pageColumns, true) ? 'p.`id` ASC' : 'p.`' . $pageTitleColumn . '` ASC';
+        $sql = 'SELECT p.`' . $pageSlugColumn . '` AS nav_slug, p.`' . $pageTitleColumn . '` AS nav_title '
+             . 'FROM `website_builder_pages` p '
+             . 'INNER JOIN `website_builder_published` w ON w.`' . $publishedSlugColumn . '` = p.`' . $pageSlugColumn . '` '
+             . 'ORDER BY ' . $orderBy;
+        $autoPublishedPages = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Throwable $e) {
+    error_log('Cloud Guru public header page menu: ' . $e->getMessage());
+}
+
+$seenPageSlugs = [];
+foreach ($cleanNav as $navItem) {
+    $navUrl = trim((string)($navItem['url'] ?? ''));
+    $navQuery = [];
+    parse_str((string)(parse_url($navUrl, PHP_URL_QUERY) ?? ''), $navQuery);
+    $existingSlug = strtolower(trim((string)($navQuery['page'] ?? '')));
+    if ($existingSlug !== '') $seenPageSlugs[$existingSlug] = true;
+}
+$autoAddedPageCount = 0;
+foreach ($autoPublishedPages as $pageItem) {
+    $slug = strtolower(trim((string)($pageItem['nav_slug'] ?? '')));
+    if ($slug === '' || $slug === 'home' || !preg_match('/^[a-z0-9][a-z0-9-]{0,118}$/', $slug)) continue;
+    if (isset($seenPageSlugs[$slug])) continue;
+
+    $label = trim((string)($pageItem['nav_title'] ?? ''));
+    if ($label === '') $label = ucwords(str_replace('-', ' ', $slug));
+    $cleanNav[] = ['label' => mb_substr($label, 0, 80, 'UTF-8'), 'url' => '/?page=' . rawurlencode($slug)];
+    $seenPageSlugs[$slug] = true;
+    $autoAddedPageCount++;
+}
+$navbar['navbar_items'] = $cleanNav;
+/* Ensure published pages remain discoverable even if the old navigation toggle was disabled. */
+if ($autoAddedPageCount > 0 || count($autoPublishedPages) > 0) $navbar['navbar_enabled'] = true;
 if(trim((string)$navbar['navbar_cta_url'])===''||$navbar['navbar_cta_url']==='#')$navbar['navbar_cta_url']='/auth/login.php';
 $header=['header_height'=>'78','header_sticky'=>'1','header_transparent'=>'0','header_bg'=>'#ffffff','header_overlay'=>'0','header_logo_width'=>'46','header_align'=>'between'];
 try{$q=$pdo->query("SELECT setting_key,setting_value FROM website_builder_settings WHERE setting_key LIKE 'header_%'");foreach($q as $r)if(array_key_exists($r['setting_key'],$header))$header[$r['setting_key']]=$r['setting_value'];}catch(Throwable $e){}
@@ -368,10 +424,16 @@ body{margin:0;background:#f5f8fb}
 .published-header.header-transparent{background:transparent!important;box-shadow:none;border-bottom-color:transparent}.published-header.header-overlay{position:absolute;left:0;right:0;color:#fff}.published-header.header-overlay .ph-copy b{color:#fff}.published-header.header-overlay .ph-copy small{color:rgba(255,255,255,.78)}.published-header.header-overlay .ph-nav{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2)}.published-header.header-overlay .ph-nav a{color:#fff}.ph-brand{display:flex;align-items:center;gap:11px;min-width:0}.ph-brand img,.ph-logo{width:<?=max(32,min(72,(int)$header['header_logo_width']))?>px;height:<?=max(32,min(72,(int)$header['header_logo_width']))?>px;border-radius:13px;object-fit:cover;flex:0 0 46px}.ph-logo{display:grid;place-items:center;background:var(--p);color:#fff;font-weight:900;box-shadow:0 8px 20px color-mix(in srgb,var(--p) 25%,transparent)}
 .ph-copy{min-width:0}.ph-copy b{display:block;font-size:14px;color:#102a43;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ph-copy small{display:block;margin-top:3px;color:#8291a3;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ph-nav{display:flex;align-items:center;gap:3px;padding:5px;background:#f8fafc;border:1px solid #edf1f5;border-radius:14px}.ph-nav a{padding:9px 11px;border-radius:9px;text-decoration:none;color:#52657a;font-size:12px;font-weight:700;transition:.18s ease}.ph-nav a:hover{background:#fff;color:var(--p);box-shadow:0 4px 12px rgba(15,23,42,.06)}.ph-nav a.ph-cta{margin-left:6px;background:linear-gradient(135deg,var(--p),color-mix(in srgb,var(--p) 78%,#000));color:#fff;box-shadow:0 8px 18px color-mix(in srgb,var(--p) 22%,transparent);padding:10px 15px}
-.ph-menu{display:none;border:0;width:42px;height:42px;border-radius:11px;background:#f1f5f9;color:#334e68;font-size:22px;cursor:pointer;position:relative;z-index:1102;pointer-events:auto;-webkit-tap-highlight-color:transparent}.published-wrap{--school-primary:<?=htmlspecialchars($settings['primary_color'])?>}.published-wrap .preview-button,.published-wrap .preview-logo{background:var(--school-primary)!important}.published-wrap .preview-nav{display:none!important}
+.ph-menu{display:none;border:0;width:42px;height:42px;border-radius:11px;background:#f1f5f9;color:#334e68;font-size:22px;cursor:pointer;position:relative;z-index:1102;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+.ph-menu-wrap{position:relative;flex:0 1 auto;min-width:0}
+.ph-nav{max-width:min(58vw,820px);overflow-x:auto;white-space:nowrap;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+.ph-nav::-webkit-scrollbar{height:4px}
+.ph-nav::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:99px}
+.ph-nav a.is-current{background:#fff;color:var(--p);box-shadow:0 4px 12px rgba(15,23,42,.06)}
+.published-wrap{--school-primary:<?=htmlspecialchars($settings['primary_color'])?>}.published-wrap .preview-button,.published-wrap .preview-logo{background:var(--school-primary)!important}.published-wrap .preview-nav{display:none!important}
 .published-footer{padding:32px 5%;background:#102a43;color:#fff;font-size:12px}.published-footer span{opacity:.8}
 @media(max-width:900px){.published-header{padding:11px 4%}.ph-nav a{padding:9px 8px;font-size:11px}.ph-nav .ph-cta{padding:9px 11px}}
-@media(max-width:760px){.published-header{padding:10px 4%;position:sticky;z-index:1100}.ph-menu{display:block;margin-left:auto;position:relative;z-index:1102;pointer-events:auto}.ph-nav{display:none;position:absolute;left:4%;right:4%;top:70px;z-index:1101;flex-direction:column;align-items:stretch;padding:10px;background:rgba(255,255,255,.98);border:1px solid #e6ebf1;border-radius:16px;box-shadow:0 18px 45px rgba(16,42,67,.16)}.ph-nav.open{display:flex}.ph-nav a{text-align:center}.ph-nav a.ph-cta{margin-left:0;margin-top:3px}.ph-copy b{font-size:12px}.ph-copy small{font-size:8px}.ph-brand img,.ph-logo{width:42px;height:42px;flex-basis:42px}}
+@media(max-width:760px){.published-header{padding:10px 4%;position:sticky;z-index:1100}.ph-menu{display:block;margin-left:auto;position:relative;z-index:1102;pointer-events:auto}.ph-nav{display:none;position:absolute;left:4%;right:4%;top:70px;z-index:1101;flex-direction:column;align-items:stretch;padding:10px;background:rgba(255,255,255,.98);border:1px solid #e6ebf1;border-radius:16px;box-shadow:0 18px 45px rgba(16,42,67,.16)}.ph-nav.open,.ph-menu-wrap[open] .ph-nav{display:flex}.ph-menu-close{display:none}.ph-menu-wrap[open] .ph-menu-open{display:none}.ph-menu-wrap[open] .ph-menu-close{display:inline}.ph-nav a{text-align:center}.ph-nav a.ph-cta{margin-left:0;margin-top:3px}.ph-copy b{font-size:12px}.ph-copy small{font-size:8px}.ph-brand img,.ph-logo{width:42px;height:42px;flex-basis:42px}}
 @media(max-width:420px){.ph-copy{max-width:180px}.ph-copy small{display:none}}
 .footer-cols-1{grid-template-columns:1fr}.footer-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.footer-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.published-footer{padding:42px 5%;font-size:12px}.footer-inner{max-width:1200px;margin:auto;display:grid;gap:28px;align-items:start}.footer-brand b,.footer-links b,.footer-contact b,.footer-social b{font-size:15px}.footer-brand span,.footer-contact span{display:block;margin-top:7px;opacity:.78;line-height:1.6}.footer-links,.footer-contact,.footer-social{display:grid;gap:8px}.footer-links a,.footer-social a{color:inherit;text-decoration:none;opacity:.82}.footer-links a:hover,.footer-social a:hover{opacity:1;text-decoration:underline}.footer-copy{max-width:1200px;margin:26px auto 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.16);opacity:.72}@media(max-width:760px){.footer-cols-2,.footer-cols-3,.footer-cols-4{grid-template-columns:1fr}}
 /* MODERN DIGITAL SCHOOL PORTAL - HOME ONLY */
@@ -391,7 +453,7 @@ body{margin:0;background:#f5f8fb}
 <link rel="stylesheet" href="/assets/css/cloud-guru-public-overrides.css?v=5"></head><body>
 <header class="published-header<?= $header['header_transparent']?' header-transparent':'' ?><?= $header['header_overlay']?' header-overlay':'' ?>">
 <div class="ph-brand"><?php if($settings['logo_url']):?><img src="<?=htmlspecialchars($settings['logo_url'])?>" alt="Logo sekolah"><?php else:?><div class="ph-logo">01</div><?php endif;?><div class="ph-copy"><b><?=htmlspecialchars($settings['site_name'])?></b><small><?=htmlspecialchars($settings['tagline'])?></small></div></div>
-<?php if($navbar['navbar_enabled']):?><details class="ph-menu-wrap"><summary class="ph-menu" aria-label="Buka menu"><span class="ph-menu-open">☰</span><span class="ph-menu-close">✕</span></summary><nav class="ph-nav nav-style-<?=htmlspecialchars($navbar['navbar_style'])?>"><?php foreach($navbar['navbar_items'] as $it):?><a href="<?=htmlspecialchars($it['url']??'#')?>"><?=htmlspecialchars($it['label']??'Menu')?></a><?php endforeach;?></nav></details><?php endif;?><a class="ph-cta ph-cloud-login" href="/auth/login.php">☁️ Masuk Cloud Guru</a></header>
+<?php if($navbar['navbar_enabled']):?><details class="ph-menu-wrap"><summary class="ph-menu" aria-label="Buka menu"><span class="ph-menu-open">☰</span><span class="ph-menu-close">✕</span></summary><nav class="ph-nav nav-style-<?=htmlspecialchars($navbar['navbar_style'])?>"><?php foreach($navbar['navbar_items'] as $it):$navHref=(string)($it['url']??'#');$navQuery=[];parse_str((string)(parse_url($navHref,PHP_URL_QUERY)??''),$navQuery);$navActive=isset($navQuery['page'])&&strtolower((string)$navQuery['page'])===$pageSlug;?><a href="<?=htmlspecialchars($navHref,ENT_QUOTES,'UTF-8')?>"<?=$navActive?' class="is-current" aria-current="page"':''?>><?=htmlspecialchars($it['label']??'Menu',ENT_QUOTES,'UTF-8')?></a><?php endforeach;?></nav></details><?php endif;?><a class="ph-cta ph-cloud-login" href="/auth/login.php">☁️ Masuk Cloud Guru</a></header>
 <main class="published-wrap">
 <?php if ($pageSlug !== 'home'): ?>
 <nav class="public-page-backhome" aria-label="Navigasi halaman">
