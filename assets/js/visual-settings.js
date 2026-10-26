@@ -340,8 +340,13 @@ function uploadSettingImage(fileInput,target,button){
    if(target==='hero_image'&&typeof window.CGVisualBuilderApplyHeroImage==='function')window.CGVisualBuilderApplyHeroImage(d.url);
   }
   if(preview){preview.src=d.url;preview.style.display='block';}
-  if(uploadStatus){uploadStatus.textContent='✓ '+d.message+' Klik Simpan Draft Pengaturan atau Simpan & Publikasikan.';uploadStatus.dataset.kind='success';}
-  setStatus('Gambar diunggah. Perubahan URL belum dipublikasikan.','success');
+  if(uploadStatus){
+   uploadStatus.textContent=target==='page-block'
+    ? '✓ Gambar masuk ke kanvas. Tutup panel ini, lalu klik Simpan Draft pada toolbar Editor Visual untuk menyimpan halaman.'
+    : '✓ '+d.message+' Klik Simpan Draft Pengaturan atau Simpan & Publikasikan.';
+   uploadStatus.dataset.kind='success';
+  }
+  setStatus(target==='page-block'?'Gambar ditambahkan ke kanvas; simpan draft halaman dari toolbar.':'Gambar diunggah. Perubahan URL belum dipublikasikan.','success');
  })
  .catch(function(e){if(uploadStatus){uploadStatus.textContent=e.message||'Upload gagal.';uploadStatus.dataset.kind='error';}setStatus(e.message||'Upload gagal.','error');})
  .finally(function(){if(button)button.disabled=false;});
