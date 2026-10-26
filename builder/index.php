@@ -900,7 +900,6 @@ var newPageDialog=document.getElementById('newPageDialog');
 var newPageError=document.getElementById('newPageDialogError');
 var slugTouched=false;
 function openNewPageDialog(){
- if(pageDirty&&!window.confirm('Ada perubahan halaman yang belum disimpan. Buat halaman baru tanpa menyimpan perubahan ini?'))return;
  newPageDialog.hidden=false;newPageError.textContent='';titleInput.focus();
 }
 function closeNewPageDialog(){newPageDialog.hidden=true;newPageError.textContent='';}
@@ -924,6 +923,20 @@ document.getElementById('closeNewPageButton').addEventListener('click',closeNewP
 document.getElementById('cancelNewPageButton').addEventListener('click',closeNewPageDialog);
 newPageDialog.addEventListener('click',function(ev){if(ev.target===newPageDialog)closeNewPageDialog();});
 document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&!newPageDialog.hidden)closeNewPageDialog();});
+window.addEventListener('beforeunload',function(ev){
+ if(pageDirty){
+  ev.preventDefault();
+  ev.returnValue='';
+ }
+});
+document.addEventListener('keydown',function(ev){
+ if((ev.ctrlKey||ev.metaKey)&&String(ev.key).toLowerCase()==='s'){
+  var settingsModal=document.querySelector('.cg-settings-overlay');
+  if(settingsModal&&settingsModal.style.display!=='none')return;
+  ev.preventDefault();
+  save('save_draft').catch(function(){});
+ }
+});
 fillPageSelect();
 if(frame.contentDocument&&frame.contentDocument.readyState==='complete'){try{decorateMain();}catch(e){}}
 })();
