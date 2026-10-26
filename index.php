@@ -19,6 +19,14 @@ $settings += [
     'hero_button_url' => '/?page=informasi',
     'hero_button2_text' => 'Profil Sekolah',
     'hero_button2_url' => '/?page=profil',
+    'footer_quicklinks' => implode("\n", ['Beranda|/?page=home','Profil Sekolah|/?page=profil','Informasi|/?page=informasi','Profil Guru|/?page=guru','Galeri|/?page=galeri']),
+    'footer_bg' => '#102a43',
+    'footer_layout' => '3',
+    'footer_show_contact' => '1',
+    'footer_show_logo' => '1',
+    'footer_show_quicklinks' => '1',
+    'footer_show_social' => '1',
+    'footer_text_color' => '#ffffff',
 ];
 try{$q=$pdo->query("SELECT setting_key,setting_value FROM website_builder_settings");foreach($q as $r)if(array_key_exists($r['setting_key'],$settings))$settings[$r['setting_key']]=$r['setting_value'];}catch(Throwable $e){}
 
@@ -333,6 +341,9 @@ if(!$ogImage)$ogImage=trim((string)($settings['hero_image']??''));
 <meta name="author" content="<?=htmlspecialchars($settings['seo_author']??$settings['site_name'])?>">
 <meta name="robots" content="<?=htmlspecialchars($robots)?>">
 <link rel="canonical" href="<?=htmlspecialchars($canonical)?>">
+<?php $faviconUrl = trim((string)($settings['favicon_url'] ?? '')); if ($faviconUrl !== '' && (preg_match('#^https?://#i', $faviconUrl) || (str_starts_with($faviconUrl, '/') && !str_starts_with($faviconUrl, '//')))): ?>
+<link rel="icon" href="<?=htmlspecialchars($faviconUrl, ENT_QUOTES, 'UTF-8')?>">
+<?php endif; ?>
 <meta property="og:type" content="<?=isset($nr)?'article':'website'?>">
 <meta property="og:title" content="<?=htmlspecialchars($title)?>">
 <meta property="og:description" content="<?=htmlspecialchars($description)?>">
