@@ -340,3 +340,19 @@ body{background:#f5f8fb!important;color:#102a43}
   .published-wrap .cg-vb-photo-bg{padding:22px!important;border-radius:14px!important}
 }
 
+/* Keep light information cards readable when their parent uses an image background. */
+.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light :is(div,article,aside,li):has(> b):has(> span),
+.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark :is(div,article,aside,li):has(> b):has(> span),
+.published-wrap .cg-vb-photo-bg .cg-vb-contrast-preserve-card{
+  color:#102a43!important;
+  text-shadow:none!important;
+}
+.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light :is(div,article,aside,li):has(> b):has(> span) *,
+.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark :is(div,article,aside,li):has(> b):has(> span) *,
+.published-wrap .cg-vb-photo-bg .cg-vb-contrast-preserve-card *{
+  color:#102a43!important;
+  text-shadow:none!important;
+}
+/* Eyebrow labels such as VISI, MISI and SEJARAH can be wrapped as independent image-backed sections. */
+.published-wrap .cg-vb-photo-section{box-sizing:border-box;min-width:0}
+
