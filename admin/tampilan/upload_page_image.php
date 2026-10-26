@@ -22,11 +22,14 @@ function cg_page_image_json(int $status, array $body): never {
     exit;
 }
 
-wajib_login();
+$userId = $_SESSION['user_id'] ?? null;
+if (!is_numeric($userId) || (int)$userId < 1) {
+    cg_page_image_json(401, ['ok' => false, 'message' => 'Sesi login berakhir. Muat ulang halaman, login kembali, lalu coba upload lagi.']);
+}
 
 $role = strtolower(trim((string)($_SESSION['role'] ?? '')));
 if (!in_array($role, ['admin', 'administrator'], true)) {
-    cg_page_image_json(403, ['ok' => false, 'message' => 'Hanya Administrator yang boleh mengunggah gambar halaman.']);
+    cg_page_image_json(403, ['ok' => false, 'message' => 'Akun ini tidak memiliki izin Administrator untuk mengunggah gambar.']);
 }
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && isset($_GET['csrf'])) {
@@ -38,11 +41,28 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     cg_page_image_json(405, ['ok' => false, 'message' => 'Metode permintaan tidak didukung.']);
 }
 
-cloudguru_csrf_require_valid();
+$expectedToken = (string)($_SESSION['cloudguru_csrf_token'] ?? '');
+$providedToken = (string)($_POST['csrf_token'] ?? '');
+if ($expectedToken === '' || $providedToken === '' || !hash_equals($expectedToken, $providedToken)) {
+    cg_page_image_json(403, ['ok' => false, 'message' => 'Token keamanan sudah kedaluwarsa. Muat ulang Editor Visual lalu coba upload lagi.']);
+}
 
 $file = $_FILES['image'] ?? null;
-if (!is_array($file) || (int)($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-    cg_page_image_json(400, ['ok' => false, 'message' => 'Pilih file gambar terlebih dahulu.']);
+if (!is_array($file)) {
+    cg_page_image_json(400, ['ok' => false, 'message' => 'File gambar tidak diterima oleh server. Pilih file lalu coba lagi.']);
+}
+$uploadError = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
+if ($uploadError !== UPLOAD_ERR_OK) {
+    $uploadMessages = [
+        UPLOAD_ERR_INI_SIZE => 'Ukuran gambar melebihi batas upload server. Coba gambar yang lebih kecil atau naikkan upload_max_filesize di cPanel.',
+        UPLOAD_ERR_FORM_SIZE => 'Ukuran gambar melebihi batas form upload.',
+        UPLOAD_ERR_PARTIAL => 'Upload gambar terputus. Coba upload ulang.',
+        UPLOAD_ERR_NO_FILE => 'Pilih file gambar terlebih dahulu.',
+        UPLOAD_ERR_NO_TMP_DIR => 'Folder sementara upload server tidak tersedia. Hubungi hosting.',
+        UPLOAD_ERR_CANT_WRITE => 'Server tidak dapat menulis file upload ke penyimpanan.',
+        UPLOAD_ERR_EXTENSION => 'Upload gambar dihentikan oleh konfigurasi PHP server.',
+    ];
+    cg_page_image_json(400, ['ok' => false, 'message' => $uploadMessages[$uploadError] ?? 'Upload gambar gagal karena kesalahan server.']);
 }
 
 $maxBytes = 8 * 1024 * 1024;

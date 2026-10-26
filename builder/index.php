@@ -694,9 +694,10 @@ function decorateMain(){
   if(clickedAnchor)ev.preventDefault();
   var img=ev.target.closest('img');
   if(img && currentMain.contains(img)){
-   selectedImage=img;
    var block=img.closest('[data-cgvb-index]')||img.parentElement;
    if(block&&currentMain.contains(block))selectBlock(block);
+   // selectBlock resets the previous image reference; retain this image after selecting its block.
+   selectedImage=img;
    selectionInfo.textContent='Gambar dipilih. Gunakan “Ganti Gambar” untuk mengganti file ini.';
    return;
   }
@@ -762,17 +763,26 @@ function addSection(type){
  setStatus('Bagian ditambahkan; simpan draft untuk menyimpan.','');
 }
 window.CGVisualBuilderAddImage=function(url,alt){
- if(!url||!currentMain){setStatus('Kanvas belum siap.','error');return;}
+ if(!url||!currentMain){setStatus('Kanvas belum siap. Tunggu sampai pratinjau selesai dimuat lalu coba lagi.','error');return;}
  addSection('image');
  var img=selectedBlock&&selectedBlock.querySelector('img');
- if(img){img.src=url;img.alt=alt||'Gambar halaman';selectedImage=img;}
- setStatus('Gambar ditambahkan ke halaman; simpan draft untuk menyimpan.','success');
+ if(img){
+  img.setAttribute('src',url);
+  img.setAttribute('alt',alt||'Gambar halaman');
+  img.setAttribute('loading','lazy');
+  selectedImage=img;
+  img.scrollIntoView({behavior:'smooth',block:'center'});
+ }
+ pageDirty=true;
+ setStatus('Gambar sudah dipasang di kanvas. Klik Simpan Draft untuk menyimpannya.','success');
 };
 window.CGVisualBuilderApplyHeroImage=function(url){
  if(!url||pageSlug!=='home'||!currentMain)return;
  var hero=currentMain.querySelector('.digital-hero');
  var img=hero&&hero.querySelector('.digital-photo img');
- if(img){img.src=url;img.removeAttribute('srcset');hero.style.setProperty('--hero-image','url("'+url.replace(/["\\)]/g,'')+'")');}
+ if(img){img.setAttribute('src',url);img.removeAttribute('srcset');hero.style.setProperty('--hero-image','url("'+url.replace(/["\\)]/g,'')+'")');}
+ pageDirty=true;
+ setStatus('Foto Hero sudah diperbarui di pratinjau. Simpan atau publikasikan untuk menerapkan perubahan.','success');
 };
 document.querySelectorAll('[data-insert]').forEach(function(button){button.addEventListener('click',function(){if(button.dataset.insert==='image'){document.getElementById('imageFile').click();}else addSection(button.dataset.insert);});});
 document.getElementById('moveUpButton').addEventListener('click',function(){
@@ -815,24 +825,46 @@ document.getElementById('imageFile').addEventListener('change',function(){
 });
 function uploadImage(file,input){
  setStatus('Mengunggah gambar…','');
+ input.disabled=true;
  var fd=new FormData();fd.append('image',file,file.name);fd.append('csrf_token',csrf);
  fetch('/admin/tampilan/upload_page_image.php',{method:'POST',credentials:'same-origin',body:fd,headers:{'Accept':'application/json'}})
- .then(function(resp){return resp.json().then(function(data){if(!resp.ok||!data.ok)throw new Error(data.message||'Upload gambar gagal.');return data;});})
+ .then(function(resp){
+  return resp.text().then(function(text){
+   var data;
+   try{data=JSON.parse(text);}catch(parseError){
+    if(resp.redirected||/<html|<!doctype/i.test(text))throw new Error('Sesi login tidak terbaca. Muat ulang Editor Visual, login kembali bila diminta, lalu coba upload lagi.');
+    if(/token keamanan tidak valid/i.test(text))throw new Error('Token keamanan sudah kedaluwarsa. Muat ulang Editor Visual lalu coba upload lagi.');
+    throw new Error('Server menolak upload (HTTP '+resp.status+'). Cek batas ukuran upload dan izin folder uploads di hosting.');
+   }
+   if(!resp.ok||!data.ok)throw new Error(data.message||'Upload gambar gagal (HTTP '+resp.status+').');
+   return data;
+  });
+ })
  .then(function(data){
   if(selectedImage&&currentMain.contains(selectedImage)){
-   selectedImage.src=data.url;selectedImage.removeAttribute('srcset');
+   selectedImage.setAttribute('src',data.url);
+   selectedImage.removeAttribute('srcset');
+   if(!selectedImage.getAttribute('alt'))selectedImage.setAttribute('alt',file.name);
    var hero=selectedImage.closest('.digital-hero');
    if(hero)hero.style.setProperty('--hero-image','url("'+data.url.replace(/["\\)]/g,'')+'")');
   }else{
    addSection('image');
    var img=selectedBlock&&selectedBlock.querySelector('img');
-   if(img)img.src=data.url;
-   selectedImage=img||null;
+   if(img){
+    img.setAttribute('src',data.url);
+    img.setAttribute('alt',file.name);
+    img.setAttribute('loading','lazy');
+    selectedImage=img;
+    img.scrollIntoView({behavior:'smooth',block:'center'});
+   }else{
+    throw new Error('Upload berhasil, tetapi gambar tidak masuk ke kanvas. Coba pilih blok Gambar sekali lagi.');
+   }
   }
   pageDirty=true;
-  setStatus('Gambar berhasil diunggah. Simpan Draft atau Publikasikan.','success');
+  setStatus('✓ Gambar sudah dipasang di kanvas. Klik Simpan Draft untuk menyimpan atau Publikasikan untuk menayangkan.','success');
   input.value='';
- }).catch(function(err){setStatus(err.message||'Upload gagal.','error');input.value='';});
+ }).catch(function(err){setStatus(err.message||'Upload gagal.','error');input.value='';})
+ .finally(function(){input.disabled=false;});
 }
 function getHeroData(){
  var hero=currentMain&&currentMain.querySelector('.digital-hero');
