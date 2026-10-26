@@ -438,6 +438,7 @@ $config = [
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="cg-visual-csrf" content="<?=cgvb_e($csrf)?>">
 <title>Editor Visual - Cloud Guru</title>
 <style>
 :root{--blue:#155eef;--ink:#192537;--muted:#63748b;--line:#dce4ef;--bg:#eef3f9;--panel:#fff;--green:#16803d}
@@ -473,7 +474,7 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
   <button id="saveDraftButton" class="btn-primary">💾 Simpan Draft</button>
   <button id="publishButton" class="btn-green">🚀 Publikasikan</button>
   <a id="viewPublic" class="btn-outline" href="<?=cgvb_e($config['publishedUrl'])?>" target="_blank" rel="noopener" style="text-decoration:none;padding:10px 12px;border-radius:9px;font-weight:750;color:#24364c">↗ Lihat Publik</a>
-  <a class="btn-outline" href="/admin/tampilan/" style="text-decoration:none;padding:10px 12px;border-radius:9px;font-weight:750;color:#24364c">⚙ Pengaturan</a>
+  <button id="websiteSettingsButton" class="btn-outline" type="button">⚙ Semua Pengaturan</button>
 </header>
 <main class="workspace">
   <aside class="panel left-panel">
@@ -729,6 +730,19 @@ function addSection(type){
  decorateBlocks();selectBlock(element);
  setStatus('Bagian ditambahkan; simpan draft untuk menyimpan.','');
 }
+window.CGVisualBuilderAddImage=function(url,alt){
+ if(!url||!currentMain){setStatus('Kanvas belum siap.','error');return;}
+ addSection('image');
+ var img=selectedBlock&&selectedBlock.querySelector('img');
+ if(img){img.src=url;img.alt=alt||'Gambar halaman';selectedImage=img;}
+ setStatus('Gambar ditambahkan ke halaman; simpan draft untuk menyimpan.','success');
+};
+window.CGVisualBuilderApplyHeroImage=function(url){
+ if(!url||pageSlug!=='home'||!currentMain)return;
+ var hero=currentMain.querySelector('.digital-hero');
+ var img=hero&&hero.querySelector('.digital-photo img');
+ if(img){img.src=url;img.removeAttribute('srcset');hero.style.setProperty('--hero-image','url("'+url.replace(/["\\)]/g,'')+'")');}
+};
 document.querySelectorAll('[data-insert]').forEach(function(button){button.addEventListener('click',function(){if(button.dataset.insert==='image'){document.getElementById('imageFile').click();}else addSection(button.dataset.insert);});});
 document.getElementById('moveUpButton').addEventListener('click',function(){
  if(!selectedBlock||isProtectedBlock(selectedBlock))return;
@@ -865,5 +879,6 @@ fillPageSelect();
 if(frame.contentDocument&&frame.contentDocument.readyState==='complete'){try{decorateMain();}catch(e){}}
 })();
 </script>
+<script src="/assets/js/visual-settings.js" defer></script>
 </body>
 </html>
