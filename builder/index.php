@@ -531,6 +531,8 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
           <button id="moveUpButton">↑ Naikkan</button>
           <button id="moveDownButton">↓ Turunkan</button>
           <button id="replaceImageButton">🖼 Ganti Gambar</button>
+          <button id="backgroundImageButton">🌄 Foto Latar + Teks Otomatis</button>
+          <button id="removeBackgroundImageButton" class="btn-outline" disabled>✕ Hapus Foto Latar</button>
           <button id="deleteBlockButton" class="btn-danger">Hapus Bagian</button>
         </div>
         <p class="tool-help" style="margin:12px 0 0">Untuk halaman Beranda, banner utama tetap terhubung ke pengaturan Hero. Teks dan gambar banner yang diubah di sini akan disimpan ke pengaturan Hero saat dipublikasikan.</p>
@@ -569,6 +571,7 @@ var selectionInfo=document.getElementById('selectionInfo');
 var selectedBlock=null;
 var selectedImage=null;
 var selectedAnchor=null;
+var uploadMode='image';
 var currentMain=null;
 var dragBlock=null;
 var pageSlug=CFG.slug;
@@ -596,12 +599,13 @@ function getDoc(){try{return frame.contentDocument || frame.contentWindow.docume
 function isProtectedBlock(el){
  if(!el||el.nodeType!==1)return true;
  var cl=String(el.className||'');
- return el.matches('.digital-hero,.school-live-stats') || /(^|\s)(digital-hero|school-live-stats)(\s|$)/.test(cl);
+ return el.matches('.digital-hero,.school-live-stats') || !!el.closest('.digital-hero,.school-live-stats') || /(^|\s)(digital-hero|school-live-stats)(\s|$)/.test(cl);
 }
 function clearDecoration(){
  if(!currentMain)return;
  currentMain.querySelectorAll('.cg-vb-selected').forEach(function(el){el.classList.remove('cg-vb-selected');});
  currentMain.querySelectorAll('[data-cgvb-index]').forEach(function(el){el.removeAttribute('data-cgvb-index');el.removeAttribute('draggable');});
+ currentMain.querySelectorAll('[data-cgvb-selectable]').forEach(function(el){el.removeAttribute('data-cgvb-selectable');});
 }
 function decorateBlocks(){
  if(!currentMain)return;
@@ -611,6 +615,12 @@ function decorateBlocks(){
   el.draggable=true;
   el.style.cursor='move';
   el.title='Klik untuk memilih bagian · seret untuk mengatur urutan';
+ });
+ // Nested headings, paragraphs, figures and sections can be selected separately.
+ currentMain.querySelectorAll('section,article,figure,h1,h2,h3,h4,h5,h6,p,blockquote,ul,ol,table').forEach(function(el){
+  if(el.parentElement===currentMain)return;
+  if(el.closest('.digital-hero,.school-live-stats'))return;
+  el.dataset.cgvbSelectable='1';
  });
  if(selectedBlock && selectedBlock.isConnected) selectedBlock.classList.add('cg-vb-selected');
 }
@@ -635,6 +645,8 @@ function selectBlock(el){
  document.getElementById('moveDownButton').disabled=locked;
  document.getElementById('deleteBlockButton').disabled=locked;
  document.getElementById('replaceImageButton').disabled=false;
+ document.getElementById('backgroundImageButton').disabled=locked;
+ document.getElementById('removeBackgroundImageButton').disabled=locked||!el.classList.contains('cg-vb-photo-bg');
 }
 function applyHero(hero){
  if(!currentMain||!hero)return;
@@ -657,7 +669,7 @@ function decorateMain(){
  if(!doc){setStatus('Pratinjau tidak dapat diakses.','error');return;}
  if(doc.head && !doc.getElementById('cgvb-editor-style')){
   var editStyle=doc.createElement('style');editStyle.id='cgvb-editor-style';
-  editStyle.textContent='.cg-vb-selected{outline:3px solid #155eef!important;outline-offset:3px!important}.published-wrap [data-cgvb-index]:hover{outline:1px dashed #70a0f5;outline-offset:2px}.published-wrap .cg-visual-section{cursor:move}.published-wrap .cg-visual-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}@media(max-width:620px){.published-wrap .cg-visual-columns{grid-template-columns:1fr!important}}';
+  editStyle.textContent='.cg-vb-selected{outline:3px solid #155eef!important;outline-offset:3px!important}.published-wrap [data-cgvb-index]:hover,.published-wrap [data-cgvb-selectable]:hover{outline:1px dashed #70a0f5;outline-offset:2px}.published-wrap .cg-visual-section{cursor:move}.published-wrap .cg-visual-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.published-wrap .cg-vb-photo-bg{background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;border-radius:18px!important;padding:clamp(22px,4vw,42px)!important;min-height:120px;isolation:isolate}.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h1,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h2,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h3,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light h4,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light p,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light li,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light span,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light b,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light strong,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-light a:not(.digital-btn){color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.4)!important}.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h1,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h2,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h3,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark h4,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark p,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark li,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark span,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark b,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark strong,.published-wrap .cg-vb-photo-bg.cg-vb-contrast-dark a:not(.digital-btn){color:#102a43!important;text-shadow:0 1px 2px rgba(255,255,255,.25)!important}@media(max-width:620px){.published-wrap .cg-visual-columns{grid-template-columns:1fr!important}}';
   doc.head.appendChild(editStyle);
  }
  currentMain=doc.querySelector('.published-wrap');
@@ -694,14 +706,14 @@ function decorateMain(){
   if(clickedAnchor)ev.preventDefault();
   var img=ev.target.closest('img');
   if(img && currentMain.contains(img)){
-   var block=img.closest('[data-cgvb-index]')||img.parentElement;
+   var block=img.closest('[data-cgvb-selectable]')||img.closest('[data-cgvb-index]')||img.parentElement;
    if(block&&currentMain.contains(block))selectBlock(block);
    // selectBlock resets the previous image reference; retain this image after selecting its block.
    selectedImage=img;
    selectionInfo.textContent='Gambar dipilih. Gunakan “Ganti Gambar” untuk mengganti file ini.';
    return;
   }
-  var block=ev.target.closest('[data-cgvb-index]') || ev.target.closest('section,article,figure');
+  var block=ev.target.closest('[data-cgvb-selectable]') || ev.target.closest('[data-cgvb-index]') || ev.target.closest('section,article,figure');
   if(block&&currentMain.contains(block))selectBlock(block);
   if(clickedAnchor){
    selectedAnchor=clickedAnchor;
@@ -816,13 +828,91 @@ document.getElementById('applyLinkUrl').addEventListener('click',function(){
  selectedAnchor.setAttribute('href',url);
  setStatus('Alamat tautan diperbarui; simpan draft untuk menyimpan.','success');
 });
-document.getElementById('replaceImageButton').addEventListener('click',function(){document.getElementById('imageFile').click();});
+document.getElementById('replaceImageButton').addEventListener('click',function(){uploadMode='image';document.getElementById('imageFile').click();});
+document.getElementById('backgroundImageButton').addEventListener('click',function(){
+ if(!selectedBlock||!currentMain.contains(selectedBlock)){setStatus('Klik bagian yang ingin diberi foto latar terlebih dahulu.','error');return;}
+ if(isProtectedBlock(selectedBlock)){setStatus('Bagian otomatis ini tidak bisa diberi foto latar dari kanvas.','error');return;}
+ uploadMode='background';
+ document.getElementById('imageFile').click();
+});
+document.getElementById('removeBackgroundImageButton').addEventListener('click',function(){
+ if(selectedBlock&&currentMain.contains(selectedBlock))removePhotoBackground(selectedBlock);
+});
+
 document.getElementById('imageFile').addEventListener('change',function(){
  var file=this.files&&this.files[0];if(!file)return;
  if(file.size>8*1024*1024){setStatus('Ukuran maksimum gambar 8 MB.','error');this.value='';return;}
  if(!/^image\/(jpeg|png|webp|gif)$/i.test(file.type)){setStatus('Gunakan JPG, PNG, WEBP, atau GIF.','error');this.value='';return;}
  uploadImage(file,this);
 });
+function averageImageLuminance(url){
+ return new Promise(function(resolve){
+  var image=new Image();
+  image.onload=function(){
+   try{
+    var canvas=document.createElement('canvas');
+    var size=24;
+    canvas.width=size;canvas.height=size;
+    var ctx=canvas.getContext('2d',{willReadFrequently:true});
+    if(!ctx){resolve(128);return;}
+    ctx.drawImage(image,0,0,size,size);
+    var pixels=ctx.getImageData(0,0,size,size).data;
+    var total=0,count=0;
+    for(var i=0;i<pixels.length;i+=4){
+     var r=pixels[i]/255,g=pixels[i+1]/255,b=pixels[i+2]/255;
+     var linear=[r,g,b].map(function(v){return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2);});
+     total+=(0.2126*linear[0]+0.7152*linear[1]+0.0722*linear[2])*255;
+     count++;
+    }
+    resolve(count?total/count:128);
+   }catch(e){resolve(128);}
+  };
+  image.onerror=function(){resolve(128);};
+  image.src=url;
+ });
+}
+function applyPhotoBackground(element,url){
+ if(!element||!url)return Promise.reject(new Error('Pilih bagian halaman terlebih dahulu.'));
+ return averageImageLuminance(url).then(function(luminance){
+  if(!element.classList.contains('cg-vb-photo-bg')){
+   element.dataset.cgPhotoPreviousBackground=element.style.backgroundImage||'';
+   element.dataset.cgPhotoPreviousSize=element.style.backgroundSize||'';
+   element.dataset.cgPhotoPreviousPosition=element.style.backgroundPosition||'';
+   element.dataset.cgPhotoPreviousRepeat=element.style.backgroundRepeat||'';
+  }
+  element.classList.add('cg-vb-photo-bg');
+  element.classList.remove('cg-vb-contrast-light','cg-vb-contrast-dark');
+  var safeUrl=url.replace(/["\\\\)]/g,'');
+  if(luminance>=145){
+   // Bright photo: soften it with a light veil and use dark, readable text.
+   element.classList.add('cg-vb-contrast-dark');
+   element.style.backgroundImage='linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,.56)), url("'+safeUrl+'")';
+  }else{
+   // Dark photo: add a dark veil and use light, readable text.
+   element.classList.add('cg-vb-contrast-light');
+   element.style.backgroundImage='linear-gradient(135deg, rgba(3,15,31,.74), rgba(3,15,31,.42)), url("'+safeUrl+'")';
+  }
+  element.style.backgroundSize='cover';
+  element.style.backgroundPosition='center';
+  element.style.backgroundRepeat='no-repeat';
+  element.scrollIntoView({behavior:'smooth',block:'center'});
+ });
+}
+function removePhotoBackground(element){
+ if(!element||!element.classList.contains('cg-vb-photo-bg'))return;
+ element.classList.remove('cg-vb-photo-bg','cg-vb-contrast-light','cg-vb-contrast-dark');
+ element.style.backgroundImage=element.dataset.cgPhotoPreviousBackground||'';
+ element.style.backgroundSize=element.dataset.cgPhotoPreviousSize||'';
+ element.style.backgroundPosition=element.dataset.cgPhotoPreviousPosition||'';
+ element.style.backgroundRepeat=element.dataset.cgPhotoPreviousRepeat||'';
+ delete element.dataset.cgPhotoPreviousBackground;
+ delete element.dataset.cgPhotoPreviousSize;
+ delete element.dataset.cgPhotoPreviousPosition;
+ delete element.dataset.cgPhotoPreviousRepeat;
+ pageDirty=true;
+ setStatus('Foto latar dihapus. Klik Simpan Draft untuk menyimpan.','success');
+ document.getElementById('removeBackgroundImageButton').disabled=true;
+}
 function uploadImage(file,input){
  setStatus('Mengunggah gambar…','');
  input.disabled=true;
@@ -841,6 +931,15 @@ function uploadImage(file,input){
   });
  })
  .then(function(data){
+  if(uploadMode==='background'){
+   if(!selectedBlock||!currentMain.contains(selectedBlock))throw new Error('Pilih bagian halaman yang akan diberi foto latar terlebih dahulu.');
+   return applyPhotoBackground(selectedBlock,data.url).then(function(){
+    pageDirty=true;
+    document.getElementById('removeBackgroundImageButton').disabled=false;
+    setStatus('✓ Foto latar terpasang. Kontras teks sudah disesuaikan otomatis. Klik Simpan Draft untuk menyimpan.','success');
+    input.value='';
+   });
+  }
   if(selectedImage&&currentMain.contains(selectedImage)){
    selectedImage.setAttribute('src',data.url);
    selectedImage.removeAttribute('srcset');
@@ -864,7 +963,7 @@ function uploadImage(file,input){
   setStatus('✓ Gambar sudah dipasang di kanvas. Klik Simpan Draft untuk menyimpan atau Publikasikan untuk menayangkan.','success');
   input.value='';
  }).catch(function(err){setStatus(err.message||'Upload gagal.','error');input.value='';})
- .finally(function(){input.disabled=false;});
+ .finally(function(){input.disabled=false;uploadMode='image';});
 }
 function getHeroData(){
  var hero=currentMain&&currentMain.querySelector('.digital-hero');
