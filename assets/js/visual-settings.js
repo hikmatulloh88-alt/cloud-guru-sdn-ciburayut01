@@ -372,6 +372,12 @@ function uploadSettingImage(fileInput,target,button){
  .catch(function(e){if(uploadStatus){uploadStatus.textContent=e.message||'Upload gagal.';uploadStatus.dataset.kind='error';}setStatus(e.message||'Upload gagal.','error');})
  .finally(function(){if(button)button.disabled=false;});
 }
+document.addEventListener('keydown',function(ev){
+ if((ev.ctrlKey||ev.metaKey)&&String(ev.key).toLowerCase()==='s'&&modal&&modal.isConnected&&modal.style.display!=='none'){
+  ev.preventDefault();ev.stopImmediatePropagation();
+  saveSettings('save_draft');
+ }
+},true);
 injectStyle();
 trigger.addEventListener('click',function(ev){ev.preventDefault();if(!modal)createModal();modal.style.display='flex';loadSettings();});
 })();
