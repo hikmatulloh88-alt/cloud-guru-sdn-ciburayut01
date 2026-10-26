@@ -617,7 +617,7 @@ function decorateBlocks(){
   el.title='Klik untuk memilih bagian · seret untuk mengatur urutan';
  });
  // Nested headings, paragraphs, figures and sections can be selected separately.
- currentMain.querySelectorAll('section,article,figure,h1,h2,h3,h4,h5,h6,p,blockquote,ul,ol,table').forEach(function(el){
+ currentMain.querySelectorAll('section,article,figure,h1,h2,h3,h4,h5,h6,p,blockquote,ul,ol,table,.eyebrow,.public-info-grid > div,[class*="info-grid"] > div,[class*="fact-grid"] > div,.public-page-content').forEach(function(el){
   if(el.parentElement===currentMain)return;
   if(el.closest('.digital-hero,.school-live-stats'))return;
   el.dataset.cgvbSelectable='1';
@@ -631,7 +631,11 @@ function selectBlock(el){
  selectedAnchor=null;
  currentMain.querySelectorAll('.cg-vb-selected').forEach(function(x){x.classList.remove('cg-vb-selected');});
  el.classList.add('cg-vb-selected');
- selectionInfo.textContent='Bagian dipilih: '+(el.tagName||'BAGIAN').toLowerCase()+'. Klik teks untuk mengedit langsung. Untuk mengatur urutan, seret bagian atau gunakan tombol Naikkan/Turunkan.';
+ var pickedLabel=isVisualSectionLabel(el)?(el.textContent||'').trim():'';
+ selectionInfo.textContent=pickedLabel
+  ? 'Bagian “'+pickedLabel+'” dipilih. Foto latar akan dipasang pada bagian ini sampai label bagian berikutnya.'
+  : 'Bagian dipilih: '+(el.tagName||'BAGIAN').toLowerCase()+'. Untuk foto per bagian, klik label seperti VISI, MISI, atau SEJARAH; jangan pilih kartu Profil Sekolah secara keseluruhan.';
+
  var anchor=el.matches('a')?el:el.querySelector('a');
  if(anchor){
   selectedAnchor=anchor;
@@ -832,6 +836,10 @@ document.getElementById('replaceImageButton').addEventListener('click',function(
 document.getElementById('backgroundImageButton').addEventListener('click',function(){
  if(!selectedBlock||!currentMain.contains(selectedBlock)){setStatus('Klik bagian yang ingin diberi foto latar terlebih dahulu.','error');return;}
  if(isProtectedBlock(selectedBlock)){setStatus('Bagian otomatis ini tidak bisa diberi foto latar dari kanvas.','error');return;}
+ var labels=Array.from(selectedBlock.querySelectorAll('.eyebrow')).filter(isVisualSectionLabel);
+ if(selectedBlock===currentMain.children[0]&&labels.length>=2&&!selectedBlock.classList.contains('cg-vb-photo-bg')){
+  if(!window.confirm('Yang dipilih adalah kartu halaman secara keseluruhan. Untuk memasang foto hanya di VISI, MISI, atau SEJARAH, tekan Batal lalu klik label bagian tersebut. Tetap pasang foto di seluruh kartu?'))return;
+ }
  uploadMode='background';
  document.getElementById('imageFile').click();
 });
@@ -871,9 +879,18 @@ function averageImageLuminance(url){
   image.src=url;
  });
 }
+function isVisualSectionLabel(el){
+ if(!el||!el.matches('.eyebrow'))return false;
+ var label=(el.textContent||'').replace(/\\s+/g,' ').trim().toLocaleUpperCase('id-ID');
+ return ['PROFIL SEKOLAH','VISI','MISI','SEJARAH','TUJUAN','PROGRAM SEKOLAH','KEGIATAN SEKOLAH','GALERI SEKOLAH','INFORMASI SEKOLAH','KONTAK SEKOLAH'].indexOf(label)!==-1;
+}
 function groupHeadingWithItsContent(element){
- if(!element||!/^H[2-6]$/.test(element.tagName)||element.closest('.cg-vb-photo-bg'))return element;
- var level=parseInt(element.tagName.substring(1),10);
+ if(!element||element.closest('.digital-hero,.school-live-stats'))return element;
+ var isHeading=/^H[1-6]$/.test(element.tagName);
+ var isLabel=isVisualSectionLabel(element);
+ if(!isHeading&&!isLabel)return element;
+ if(element.classList.contains('cg-vb-photo-bg'))return element;
+ var level=isHeading?parseInt(element.tagName.substring(1),10):null;
  var parent=element.parentElement;
  if(!parent)return element;
  var wrapper=element.ownerDocument.createElement('section');
@@ -882,7 +899,11 @@ function groupHeadingWithItsContent(element){
  parent.insertBefore(wrapper,element);
  var node=element;
  while(node){
-  if(node!==element&&/^H[1-6]$/.test(node.tagName)&&parseInt(node.tagName.substring(1),10)<=level)break;
+  if(node!==element){
+   if(isLabel&&isVisualSectionLabel(node))break;
+   if(isHeading&&/^H[1-6]$/.test(node.tagName)&&parseInt(node.tagName.substring(1),10)<=level)break;
+   if(isHeading&&isVisualSectionLabel(node))break;
+  }
   var next=node.nextElementSibling;
   wrapper.appendChild(node);
   node=next;
@@ -899,6 +920,24 @@ function promoteImageBlockToBackground(element){
  var figure=image.closest('figure');
  image.remove();
  if(figure && !figure.querySelector('img') && !figure.textContent.trim())figure.remove();
+}
+function markReadableInnerCards(element){
+ if(!element)return;
+ element.querySelectorAll('div,article,aside,li').forEach(function(card){
+  if(card===element)return;
+  var hasLabel=card.querySelector(':scope > b, :scope > strong, :scope > label');
+  var hasValue=card.querySelector(':scope > span, :scope > p, :scope > small');
+  var computed=frame.contentWindow.getComputedStyle(card);
+  var bg=String(computed.backgroundColor||'');
+  var match=bg.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)(?:,\\s*([\\d.]+))?\\)/i);
+  if(!match)return;
+  var alpha=match[4]===undefined?1:Number(match[4]);
+  if(alpha<0.65)return;
+  var red=Number(match[1]),green=Number(match[2]),blue=Number(match[3]);
+  var luminance=(0.2126*red+0.7152*green+0.0722*blue);
+  if(luminance<150)return;
+  if(hasLabel&&hasValue)card.classList.add('cg-vb-contrast-preserve-card');
+ });
 }
 function applyPhotoBackground(element,url){
  if(!element||!url)return Promise.reject(new Error('Pilih bagian halaman terlebih dahulu.'));
@@ -936,6 +975,7 @@ function applyPhotoBackground(element,url){
   element.style.setProperty('background-repeat','no-repeat','important');
   element.style.setProperty('background-color','transparent','important');
   element.style.setProperty('color',luminance>=145?'#102a43':'#ffffff','important');
+  markReadableInnerCards(element);
   element.scrollIntoView({behavior:'smooth',block:'center'});
  });
 }
@@ -1031,6 +1071,7 @@ function getHeroData(){
 }
 function getContentHtml(){
  var clone=currentMain.cloneNode(true);
+ clone.querySelectorAll('.public-page-backhome, nav[aria-label="Navigasi halaman"]').forEach(function(el){el.remove();});
  clone.querySelectorAll('.cg-vb-selected').forEach(function(el){el.classList.remove('cg-vb-selected');});
  clone.querySelectorAll('[data-cgvb-index]').forEach(function(el){el.removeAttribute('data-cgvb-index');el.removeAttribute('draggable');el.style.removeProperty('cursor');el.removeAttribute('title');});
  clone.querySelectorAll('[contenteditable]').forEach(function(el){el.removeAttribute('contenteditable');});
