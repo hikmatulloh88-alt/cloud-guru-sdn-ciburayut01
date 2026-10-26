@@ -55,7 +55,7 @@ var categories = [
  {id:'footer',label:'🧩 Footer',title:'Footer Website',desc:'Kelola tulisan penutup, link cepat, warna, dan bagian footer yang terlihat.',fields:[
   {key:'footer_text',label:'Tulisan footer',type:'textarea'},
   {key:'footer_quicklinks',label:'Menu cepat (satu baris: Label|URL)',type:'textarea'},
-  {key:'footer_layout',label:'Tata letak footer',type:'select',options:[['columns','Beberapa kolom'],['stacked','Bertumpuk'],['centered','Rata tengah']]},
+  {key:'footer_layout',label:'Tata letak footer',type:'select',options:[['2','2 kolom'],['3','3 kolom'],['4','4 kolom']]},
   {key:'footer_show_logo',label:'Tampilkan logo',type:'checkbox'},
   {key:'footer_show_contact',label:'Tampilkan kontak',type:'checkbox'},
   {key:'footer_show_quicklinks',label:'Tampilkan menu cepat',type:'checkbox'},
