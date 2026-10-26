@@ -511,6 +511,11 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
     <div class="panel-title">Bagian terpilih</div>
     <div class="right-body">
       <div id="selectionInfo" class="selected-info">Klik salah satu bagian di pratinjau. Anda bisa mengedit teks langsung pada halaman.</div>
+      <div id="linkEditor" style="display:none;margin-top:10px">
+        <label for="selectedLinkUrl" style="display:block;font-size:11px;font-weight:800;color:#60718a;margin-bottom:5px">Alamat tujuan tautan / tombol</label>
+        <input id="selectedLinkUrl" type="text" placeholder="/?page=informasi atau https://..." style="width:100%;border:1px solid #dce4ef;border-radius:8px;padding:9px">
+        <button id="applyLinkUrl" style="margin-top:7px;width:100%">Pasang Alamat</button>
+      </div>
       <div>
         <div class="actions-grid">
           <button id="moveUpButton">↑ Naikkan</button>
@@ -533,6 +538,7 @@ var statusEl=document.getElementById('status');
 var selectionInfo=document.getElementById('selectionInfo');
 var selectedBlock=null;
 var selectedImage=null;
+var selectedAnchor=null;
 var currentMain=null;
 var dragBlock=null;
 var pageSlug=CFG.slug;
@@ -581,9 +587,18 @@ function selectBlock(el){
  if(!el||!currentMain)return;
  selectedBlock=el;
  selectedImage=null;
+ selectedAnchor=null;
  currentMain.querySelectorAll('.cg-vb-selected').forEach(function(x){x.classList.remove('cg-vb-selected');});
  el.classList.add('cg-vb-selected');
  selectionInfo.textContent='Bagian dipilih: '+(el.tagName||'BAGIAN').toLowerCase()+'. Klik teks untuk mengedit langsung. Untuk mengatur urutan, seret bagian atau gunakan tombol Naikkan/Turunkan.';
+ var anchor=el.matches('a')?el:el.querySelector('a');
+ if(anchor){
+  selectedAnchor=anchor;
+  document.getElementById('selectedLinkUrl').value=anchor.getAttribute('href')||'';
+  document.getElementById('linkEditor').style.display='block';
+ }else{
+  document.getElementById('linkEditor').style.display='none';
+ }
  var locked=isProtectedBlock(el);
  document.getElementById('moveUpButton').disabled=locked;
  document.getElementById('moveDownButton').disabled=locked;
@@ -644,7 +659,8 @@ function decorateMain(){
  }
  currentMain.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(ev){ev.preventDefault();},true);});
  currentMain.addEventListener('click',function(ev){
-  if(ev.target.closest('a'))ev.preventDefault();
+  var clickedAnchor=ev.target.closest('a');
+  if(clickedAnchor)ev.preventDefault();
   var img=ev.target.closest('img');
   if(img && currentMain.contains(img)){
    selectedImage=img;
@@ -655,6 +671,11 @@ function decorateMain(){
   }
   var block=ev.target.closest('[data-cgvb-index]') || ev.target.closest('section,article,figure');
   if(block&&currentMain.contains(block))selectBlock(block);
+  if(clickedAnchor){
+   selectedAnchor=clickedAnchor;
+   document.getElementById('selectedLinkUrl').value=clickedAnchor.getAttribute('href')||'';
+   document.getElementById('linkEditor').style.display='block';
+  }
  },true);
  currentMain.addEventListener('input',function(){setStatus('Ada perubahan belum disimpan','');});
  currentMain.addEventListener('dragstart',function(ev){
@@ -728,6 +749,15 @@ document.getElementById('deleteBlockButton').addEventListener('click',function()
  if(!window.confirm('Hapus bagian yang dipilih?'))return;
  var old=selectedBlock;selectedBlock=null;old.remove();decorateBlocks();selectionInfo.textContent='Bagian dihapus. Simpan draft untuk menyimpan perubahan.';
  setStatus('Bagian dihapus; simpan draft.','');
+});
+document.getElementById('applyLinkUrl').addEventListener('click',function(){
+ if(!selectedAnchor||!currentMain||!currentMain.contains(selectedAnchor)){setStatus('Pilih tautan atau tombol pada pratinjau terlebih dahulu.','error');return;}
+ var url=document.getElementById('selectedLinkUrl').value.trim();
+ if(!url){setStatus('Isi alamat tujuan tautan.','error');return;}
+ if(/^(javascript|data|vbscript):/i.test(url)){setStatus('Alamat tautan tidak aman.','error');return;}
+ if(!/^(https?:\/\/|\/|#|\?|mailto:|tel:)/i.test(url))url='https://' + url;
+ selectedAnchor.setAttribute('href',url);
+ setStatus('Alamat tautan diperbarui; simpan draft untuk menyimpan.','success');
 });
 document.getElementById('replaceImageButton').addEventListener('click',function(){document.getElementById('imageFile').click();});
 document.getElementById('imageFile').addEventListener('change',function(){
