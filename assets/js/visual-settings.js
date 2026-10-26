@@ -6,6 +6,7 @@ if (!trigger) return;
 var csrf = (document.querySelector('meta[name="cg-visual-csrf"]') || {}).content || '';
 var values = {};
 var activeGroup = 'identitas';
+var settingsSearch = '';
 var dirty = false;
 var loading = false;
 var uploadTarget = 'hero_image';
@@ -98,6 +99,7 @@ function injectStyle(){
  '.cg-settings-close{border:1px solid #d8e1ef;background:#fff;border-radius:9px;padding:8px 12px;font-size:19px;line-height:1;cursor:pointer}' +
  '.cg-settings-body{display:grid;grid-template-columns:205px minmax(0,1fr);min-height:0;flex:1}' +
  '.cg-settings-tabs{padding:12px 9px;overflow:auto;background:#f0f4fa;border-right:1px solid #dfe6f0;display:flex;flex-direction:column;gap:5px}' +
+ '.cg-settings-search{position:sticky;top:0;z-index:2;width:100%;min-width:0;box-sizing:border-box;margin:0 0 7px;padding:10px 10px;border:1px solid #cbd7e6;border-radius:9px;background:#fff;font:13px system-ui;outline-offset:2px}.cg-settings-empty{padding:12px;color:#6b7789;font-size:12px;line-height:1.5}' +
  '.cg-settings-tab{padding:10px 11px;text-align:left;border:1px solid transparent;border-radius:9px;background:transparent;color:#42536b;font:650 13px system-ui;cursor:pointer}' +
  '.cg-settings-tab:hover{background:#e3ecf9}.cg-settings-tab.active{background:#dfeaff;color:#0b57d0;border-color:#c4d8ff}' +
  '.cg-settings-content{padding:22px;overflow:auto;background:#fff}.cg-settings-content h3{margin:0 0 5px;font-size:20px}.cg-settings-description{margin:0 0 18px;color:#63748b;font-size:13px;max-width:720px}' +
@@ -150,13 +152,32 @@ function createModal(){
 }
 function setStatus(message,kind){if(!status)return;status.textContent=message;status.dataset.kind=kind||'';}
 function closeModal(){if(dirty&&!window.confirm('Ada perubahan pengaturan yang belum disimpan sebagai draft. Tutup tanpa menyimpannya?'))return false;if(modal)modal.style.display='none';return true;}
-function renderTabs(){
+function renderTabs(restoreFocus, caretPosition){
  tabList.textContent='';
- categories.forEach(function(cat){
+ var search=el('input',{class:'cg-settings-search',type:'search',placeholder:'Cari pengaturan…','aria-label':'Cari kategori atau pengaturan'});
+ search.value=settingsSearch;
+ search.addEventListener('input',function(){
+  settingsSearch=search.value;
+  var caret=search.selectionStart;
+  renderTabs(true,caret);
+ });
+ tabList.appendChild(search);
+ var query=settingsSearch.trim().toLocaleLowerCase();
+ var matches=categories.filter(function(cat){
+  if(!query)return true;
+  var haystack=[cat.label,cat.title,cat.desc].concat((cat.fields||[]).map(function(field){return field.label+' '+field.key;})).join(' ').toLocaleLowerCase();
+  return haystack.indexOf(query)!==-1;
+ });
+ matches.forEach(function(cat){
   var b=el('button',{class:'cg-settings-tab'+(cat.id===activeGroup?' active':''),type:'button',text:cat.label,'data-group':cat.id});
   b.addEventListener('click',function(){activeGroup=cat.id;renderTabs();renderGroup(cat.id);});
   tabList.appendChild(b);
  });
+ if(!matches.length)tabList.appendChild(el('div',{class:'cg-settings-empty',text:'Tidak ada pengaturan yang cocok. Coba kata lain.'}));
+ if(restoreFocus){
+  var again=tabList.querySelector('.cg-settings-search');
+  if(again){again.focus();try{again.setSelectionRange(caretPosition,caretPosition);}catch(e){}}
+ }
 }
 function fieldHtml(field){
  var val=values[field.key];
