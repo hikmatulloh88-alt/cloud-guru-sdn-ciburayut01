@@ -329,6 +329,11 @@ $published = preg_replace('/(<(?:p|span|small|div|b|strong)[^>]*>)\s*undefined\s
 $published = preg_replace('/<button[^>]*>\s*Tombol Baru\s*<\/button>/i', '', (string)$published);
 $published = preg_replace('/<a[^>]*>\s*Tombol Baru\s*<\/a>/i', '', (string)$published);
 
+/* Remove old back-to-home links saved inside Builder page content; the page shell renders one styled link. */
+$published = preg_replace('~<nav\\b(?:(?!</nav>).)*(?:public-page-backhome|Navigasi halaman)(?:(?!</nav>).)*</nav>~is', '', (string)$published);
+$published = preg_replace('~<a\\b(?:(?!</a>).)*Kembali ke Beranda(?:(?!</a>).)*</a>~is', '', (string)$published);
+$published = preg_replace('~<nav\\b[^>]*>\\s*</nav>~is', '', (string)$published);
+
 $robots=trim((string)($settings['seo_robots']??'index,follow'));
 $ogImage=trim((string)($settings['seo_og_image']??''));
 if(!$ogImage)$ogImage=trim((string)($settings['hero_image']??''));
@@ -383,7 +388,7 @@ body{margin:0;background:#f5f8fb}
 </style>
 
 
-<link rel="stylesheet" href="/assets/css/cloud-guru-public-overrides.css?v=4"></head><body>
+<link rel="stylesheet" href="/assets/css/cloud-guru-public-overrides.css?v=5"></head><body>
 <header class="published-header<?= $header['header_transparent']?' header-transparent':'' ?><?= $header['header_overlay']?' header-overlay':'' ?>">
 <div class="ph-brand"><?php if($settings['logo_url']):?><img src="<?=htmlspecialchars($settings['logo_url'])?>" alt="Logo sekolah"><?php else:?><div class="ph-logo">01</div><?php endif;?><div class="ph-copy"><b><?=htmlspecialchars($settings['site_name'])?></b><small><?=htmlspecialchars($settings['tagline'])?></small></div></div>
 <?php if($navbar['navbar_enabled']):?><details class="ph-menu-wrap"><summary class="ph-menu" aria-label="Buka menu"><span class="ph-menu-open">☰</span><span class="ph-menu-close">✕</span></summary><nav class="ph-nav nav-style-<?=htmlspecialchars($navbar['navbar_style'])?>"><?php foreach($navbar['navbar_items'] as $it):?><a href="<?=htmlspecialchars($it['url']??'#')?>"><?=htmlspecialchars($it['label']??'Menu')?></a><?php endforeach;?></nav></details><?php endif;?><a class="ph-cta ph-cloud-login" href="/auth/login.php">☁️ Masuk Cloud Guru</a></header>
