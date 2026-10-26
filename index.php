@@ -21,7 +21,7 @@ $settings += [
     'hero_button2_url' => '/?page=profil',
     'footer_quicklinks' => implode("\n", ['Beranda|/?page=home','Profil Sekolah|/?page=profil','Informasi|/?page=informasi','Profil Guru|/?page=guru','Galeri|/?page=galeri']),
     'footer_bg' => '#102a43',
-    'footer_layout' => 'columns',
+    'footer_layout' => '3',
     'footer_show_contact' => '1',
     'footer_show_logo' => '1',
     'footer_show_quicklinks' => '1',
