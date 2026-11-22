@@ -14,11 +14,29 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 
 require_once __DIR__ . '/../config/database.php'; // $pdo = DB Cloud Guru
 require_once __DIR__ . '/../absensi_sd/config/database.php'; // $koneksi = DB Absensi
+require_once __DIR__ . '/../includes/csrf.php';
+
+function login_safe_next(): string
+{
+    $next = isset($_GET['next']) && is_string($_GET['next']) ? $_GET['next'] : '';
+    if (
+        $next === '' ||
+        $next[0] !== '/' ||
+        substr($next, 0, 2) === '//' ||
+        strpos($next, "\\") !== false ||
+        preg_match('/[\r\n\x00]/', $next)
+    ) {
+        return '/dashboard/index.php';
+    }
+    return $next;
+}
 
 if (!empty($_SESSION['user_id'])) {
-    header('Location: ' . ((isset($_GET['next']) && is_string($_GET['next']) && strpos($_GET['next'], '/') === 0 && strpos($_GET['next'], '//') !== 0 && strpos($_GET['next'], "\\") === false) ? $_GET['next'] : '../dashboard/index.php'));
+    header('Location: ' . login_safe_next(), true, 302);
     exit;
 }
+
+$loginCsrf = cloudguru_csrf_token();
 
 function e($v): string {
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
@@ -238,10 +256,19 @@ function ensure_personal_folders(PDO $pdo, int $portalUserId): void {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        cloudguru_csrf_require_valid();
+    } catch (RuntimeException $e) {
+        $error = 'Sesi login kedaluwarsa. Muat ulang halaman lalu coba kembali.';
+        $loginCsrf = cloudguru_csrf_token();
+    }
+
     $username = trim((string)($_POST['username'] ?? ''));
     $password = (string)($_POST['password'] ?? '');
 
-    if ($username === '' || $password === '') {
+    if ($error !== '') {
+        // CSRF rejection already set a safe, user-facing error.
+    } elseif ($username === '' || $password === '') {
         $error = 'Username dan password wajib diisi.';
     } else {
         try {
@@ -250,8 +277,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = mysqli_query($koneksi, "SHOW COLUMNS FROM users");
             if ($res) while ($c = mysqli_fetch_assoc($res)) $columns[$c['Field']] = true;
 
-            $userCol = $columns['username'] ? 'username' : ($columns['user'] ?? false ? 'user' : null);
-            $passCol = $columns['password'] ? 'password' : ($columns['pass'] ?? false ? 'pass' : null);
+            $userCol = ($columns['username'] ?? false) ? 'username' : (($columns['user'] ?? false) ? 'user' : null);
+            $passCol = ($columns['password'] ?? false) ? 'password' : (($columns['pass'] ?? false) ? 'pass' : null);
 
             if (!$userCol || !$passCol) {
                 throw new RuntimeException('Struktur akun Absensi tidak sesuai.');
@@ -276,7 +303,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$ok && $stored !== '' && hash_equals($stored, $password)) {
                     $ok = true;
                     $newHash = password_hash($password, PASSWORD_DEFAULT);
-                    $idCol = $columns['id_user'] ? 'id_user' : 'id';
+                    $idCol = ($columns['id_user'] ?? false) ? 'id_user' : 'id';
                     $up = mysqli_prepare($koneksi, "UPDATE users SET `$passCol`=? WHERE `$idCol`=? LIMIT 1");
                     if ($up) {
                         $uid=(int)$absUser[$idCol];
@@ -306,7 +333,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['absensi_user_id'] = isset($absUser['id_user']) ? (int)$absUser['id_user'] : null;
                     $_SESSION['login_user'] = true;
 
-                    header('Location: ../dashboard/index.php');
+                    header('Location: ' . login_safe_next(), true, 303);
                     exit;
                 }
             }
@@ -324,17 +351,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Login - Cloud Guru</title>
 <link rel="stylesheet" href="../assets/css/main.css">
-<link rel="stylesheet" href="../assets/css/glass-ui.css?v=2">
+<link rel="stylesheet" href="../assets/css/glass-ui.css?v=3">
 </head>
 <body class="login-page">
 <main class="login-stage">
-<header class="login-heading"><h2>Glassy Login</h2><p>Cloud Guru</p></header>
 <div class="login-card">
-<div class="logo">☁️</div>
+<div class="login-logo"><img src="/assets/images/logo-sekolah.svg" alt="Logo SDN Ciburayut 01"></div>
 <h1>Selamat Datang Kembali</h1>
 <p>Gunakan username dan password yang sama dengan Aplikasi Absensi.</p>
 <?php if ($error): ?><div class="alert"><?=e($error)?></div><?php endif; ?>
 <form method="post" autocomplete="on">
+<input type="hidden" name="csrf_token" value="<?=e($loginCsrf)?>">
 <label for="username">Username</label>
 <input id="username" name="username" autocomplete="username" required autofocus>
 <label for="password">Password</label>

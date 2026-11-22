@@ -24,12 +24,22 @@ deployment:
     - /bin/cp gdrive/connect.php $DEPLOYPATH/gdrive/
     - /bin/cp gdrive/callback.php $DEPLOYPATH/gdrive/
     - /bin/mkdir -p $DEPLOYPATH/config
+    - /bin/cp config/database.php $DEPLOYPATH/config/database.php
+    - /bin/chmod 640 $DEPLOYPATH/config/database.php
+    - /bin/cp config/database.example.php $DEPLOYPATH/config/database.example.php
+    - /bin/chmod 644 $DEPLOYPATH/config/database.example.php
+    - /bin/mkdir -p $DEPLOYPATH/absensi_sd/config
+    - /bin/cp absensi_sd/config/database.php $DEPLOYPATH/absensi_sd/config/database.php
+    - /bin/chmod 640 $DEPLOYPATH/absensi_sd/config/database.php
     - /bin/cp config/google_drive_lib.php $DEPLOYPATH/config/
     - /bin/cp config/google_drive_lib.php $DEPLOYPATH/config/google_drive_lib.php
     - /bin/chmod 644 $DEPLOYPATH/config/google_drive_lib.php
     - /bin/cp config/school_stats.php $DEPLOYPATH/config/
     - /bin/mkdir -p $DEPLOYPATH/assets/css
     - /bin/mkdir -p $DEPLOYPATH/assets/js
+    - /bin/mkdir -p $DEPLOYPATH/assets/images
+    - /bin/cp assets/images/logo-sekolah.svg $DEPLOYPATH/assets/images/logo-sekolah.svg
+    - /bin/chmod 644 $DEPLOYPATH/assets/images/logo-sekolah.svg
     - /bin/cp assets/js/page-image-upload.js $DEPLOYPATH/assets/js/page-image-upload.js
     - /bin/cp assets/js/visual-settings.js $DEPLOYPATH/assets/js/visual-settings.js
     - /bin/cp assets/css/cloud-guru-public-overrides.css $DEPLOYPATH/assets/css/cloud-guru-public-overrides.css
@@ -42,6 +52,9 @@ deployment:
     - /bin/cp storage/download.php $DEPLOYPATH/storage/
     - /bin/cp storage/thumbnail.php $DEPLOYPATH/storage/
     - /bin/mkdir -p $DEPLOYPATH/auth
+    - /bin/mkdir -p $DEPLOYPATH/dashboard
+    - /bin/cp dashboard/index.php $DEPLOYPATH/dashboard/index.php
+    - /bin/chmod 644 $DEPLOYPATH/dashboard/index.php
     - /bin/mkdir -p $DEPLOYPATH/builder
     - /bin/cp builder/index.php $DEPLOYPATH/builder/index.php
     - /bin/cp builder/settings.php $DEPLOYPATH/builder/settings.php

@@ -30,5 +30,5 @@ Thumbs.db
 
 # Google Drive / database secrets — never commit real server config
 config/google_drive.php
-config/database.php
+config/database.local.php
 config/config.local.php
