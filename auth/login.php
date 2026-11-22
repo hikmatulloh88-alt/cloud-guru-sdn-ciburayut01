@@ -324,21 +324,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Login - Cloud Guru</title>
 <link rel="stylesheet" href="../assets/css/main.css">
-<link rel="stylesheet" href="../assets/css/glass-ui.css?v=1">
+<link rel="stylesheet" href="../assets/css/glass-ui.css?v=2">
 </head>
 <body class="login-page">
+<main class="login-stage">
+<header class="login-heading"><h2>Glassy Login</h2><p>Cloud Guru</p></header>
 <div class="login-card">
 <div class="logo">☁️</div>
-<h1>Cloud Administrasi Guru</h1>
+<h1>Selamat Datang Kembali</h1>
 <p>Gunakan username dan password yang sama dengan Aplikasi Absensi.</p>
 <?php if ($error): ?><div class="alert"><?=e($error)?></div><?php endif; ?>
 <form method="post" autocomplete="on">
-<label>Username</label>
-<input name="username" autocomplete="username" required autofocus>
-<label>Password</label>
-<input type="password" name="password" autocomplete="current-password" required>
+<label for="username">Username</label>
+<input id="username" name="username" autocomplete="username" required autofocus>
+<label for="password">Password</label>
+<input id="password" type="password" name="password" autocomplete="current-password" required>
 <button class="btn primary full" type="submit">Masuk</button>
 </form>
 </div>
+<p class="login-caption">Akses aman · Portal Administrasi Guru</p>
+</main>
 </body>
 </html>

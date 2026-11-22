@@ -213,7 +213,7 @@ button,input{font:inherit}
 @media(max-width:430px){.wrap{width:calc(100% - 22px)}.brand{gap:8px}.brand small{font-size:10px}.back-link{gap:5px}.back-link .back-label{display:none}.hero{min-height:0;padding:23px 18px}.hero-art{width:56px;height:56px;margin-left:8px;border-radius:17px}.hero-art span{font-size:28px}.hero h1{font-size:28px}.hero p{font-size:12px}.status-card{align-items:flex-start;flex-wrap:wrap}.status-card>.btn{width:100%}.panel{padding:15px}.panel-heading h2{font-size:16px}.upload-form{align-items:stretch;padding:11px}.upload-form input[type=file]{flex-basis:100%}.upload-form button{width:100%}.drive-preview{height:105px}.drive-file-name{font-size:12px}.drive-meta{font-size:10px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 </style>
-<link rel="stylesheet" href="/assets/css/glass-ui.css?v=1">
+<link rel="stylesheet" href="/assets/css/glass-ui.css?v=2">
 </head>
 <body class="storage-page">
 <main class="wrap">
