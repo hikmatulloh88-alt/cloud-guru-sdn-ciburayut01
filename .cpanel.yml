@@ -8,6 +8,7 @@ deployment:
     - /bin/cp includes/sidebar.php $DEPLOYPATH/includes/sidebar.php
     - /bin/mkdir -p $DEPLOYPATH/auth
     - /bin/cp auth/login.php $DEPLOYPATH/auth/login.php
+    - /bin/cp auth/login.css $DEPLOYPATH/auth/login.css
     - /bin/cp auth/logout.php $DEPLOYPATH/auth/logout.php
     - /bin/mkdir -p $DEPLOYPATH/admin/tampilan
     - /bin/cp admin/tampilan/upload_page_image.php $DEPLOYPATH/admin/tampilan/upload_page_image.php
@@ -15,6 +16,7 @@ deployment:
     - /bin/cp ai-studio/index.php $DEPLOYPATH/ai-studio/index.php
     - /bin/cp ai-studio/generate.php $DEPLOYPATH/ai-studio/generate.php
     - /bin/cp ai-studio/status.php $DEPLOYPATH/ai-studio/status.php
+    - /bin/cp ai-studio/download.php $DEPLOYPATH/ai-studio/download.php
     - /bin/mkdir -p $DEPLOYPATH/self-healing
     - /bin/cp self-healing/logger.php $DEPLOYPATH/self-healing/
     - /bin/cp self-healing/patch_engine.php $DEPLOYPATH/self-healing/

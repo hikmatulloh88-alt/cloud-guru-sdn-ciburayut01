@@ -349,49 +349,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Login - Cloud Guru</title>
-<link rel="stylesheet" href="../assets/css/main.css">
-<link rel="stylesheet" href="../assets/css/glass-ui.css?v=3">
-<link rel="stylesheet" href="/auth/login.css?v=1">
+<title>Masuk — Cloud Guru SDN Ciburayut 01</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/auth/login.css?v=2">
 </head>
 <body class="login-page">
 <main class="login-stage">
-<section class="login-aside" aria-label="Informasi portal sekolah">
-<div class="login-brand">
-<img src="/assets/images/logo-sekolah-ciburayut.svg" alt="Logo SDN Ciburayut 01">
-<span>SDN CIBURAYUT 01</span>
-</div>
-<div class="login-aside-copy">
-<span class="login-kicker">PORTAL SEKOLAH DIGITAL</span>
-<h2>Ruang kerja sekolah, dalam satu akun.</h2>
-<p>Kelola administrasi dan layanan pendidikan dengan akun yang sama seperti Aplikasi Absensi.</p>
-<div class="login-visual" aria-hidden="true">
-<span class="login-visual-orbit"></span>
-<span class="login-visual-card login-visual-card-main"><b>01</b><span>Cloud Guru</span></span>
-<span class="login-visual-card login-visual-card-small">Administrasi sekolah</span>
-</div>
-</div>
-<div class="login-aside-foot">Akses khusus warga sekolah</div>
-</section>
-<section class="login-panel">
-<div class="login-card">
-<div class="login-heading">
-<span class="login-mobile-brand">Cloud Guru · SDN Ciburayut 01</span>
-<h1>Selamat Datang Kembali</h1>
-<p>Gunakan username dan password yang sama dengan Aplikasi Absensi.</p>
-</div>
-<?php if ($error): ?><div class="alert"><?=e($error)?></div><?php endif; ?>
-<form method="post" autocomplete="on">
-<input type="hidden" name="csrf_token" value="<?=e($loginCsrf)?>">
-<label for="username">Username</label>
-<input id="username" name="username" autocomplete="username" required autofocus>
-<label for="password">Password</label>
-<input id="password" type="password" name="password" autocomplete="current-password" required>
-<button class="btn primary full" type="submit">Masuk</button>
-</form>
-</div>
-<p class="login-caption">Akses aman · Portal Administrasi Guru</p>
-</section>
+  <section class="login-aside" aria-label="Informasi portal sekolah">
+    <div class="login-brand">
+      <img src="/assets/images/logo-sekolah-ciburayut.svg" alt="Logo SDN Ciburayut 01">
+      <div>
+        <span>SDN CIBURAYUT 01</span>
+        <small>KABUPATEN BOGOR</small>
+      </div>
+    </div>
+    <div class="login-aside-copy">
+      <span class="login-kicker">PORTAL SEKOLAH DIGITAL</span>
+      <h2>Ruang kerja sekolah, dalam satu akun.</h2>
+      <p>Kelola administrasi pembelajaran, arsip Google Drive, dan layanan digital pendidikan dengan akun yang sama seperti Aplikasi Absensi.</p>
+      <div class="login-visual" aria-hidden="true">
+        <span class="login-visual-orbit"></span>
+        <span class="login-visual-card login-visual-card-main"><b>01</b><span>Cloud Guru<small>Terintegrasi Absensi</small></span></span>
+        <span class="login-visual-card login-visual-card-small">✓ Single Sign-On</span>
+      </div>
+    </div>
+    <div class="login-aside-foot">Akses khusus pendidik &amp; tenaga kependidikan</div>
+  </section>
+
+  <section class="login-panel">
+    <div class="login-top-nav">
+      <a class="login-back-portal" href="/?page=home">← Kembali ke Portal Sekolah</a>
+    </div>
+    <div class="login-card">
+      <div class="login-heading">
+        <span class="login-mobile-brand">Cloud Guru · SDN Ciburayut 01</span>
+        <h1>Selamat Datang Kembali</h1>
+        <p>Masukkan username dan password yang sama dengan Aplikasi Absensi.</p>
+      </div>
+      <?php if ($error): ?><div class="alert" role="alert"><?= e($error) ?></div><?php endif; ?>
+      <form id="loginForm" method="post" autocomplete="on">
+        <input type="hidden" name="csrf_token" value="<?= e($loginCsrf) ?>">
+        <label for="username">Username</label>
+        <input id="username" name="username" placeholder="Masukkan username Anda" autocomplete="username" required autofocus>
+
+        <label for="password">Password</label>
+        <div class="password-wrap">
+          <input id="password" type="password" name="password" placeholder="Masukkan password Anda" autocomplete="current-password" required>
+          <button type="button" class="toggle-pass" id="togglePass" aria-label="Tampilkan password" title="Tampilkan / Sembunyikan Password">
+            <svg id="eyeOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eyeClosed" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+          </button>
+        </div>
+
+        <button id="loginSubmit" class="btn primary full" type="submit">Masuk ke Cloud Guru</button>
+      </form>
+    </div>
+    <p class="login-caption">Koneksi terenkripsi · Portal Administrasi Guru SDN Ciburayut 01</p>
+  </section>
 </main>
+<script>
+(function(){
+  var pass = document.getElementById('password');
+  var toggle = document.getElementById('togglePass');
+  var eyeOpen = document.getElementById('eyeOpen');
+  var eyeClosed = document.getElementById('eyeClosed');
+  if (pass && toggle){
+    toggle.addEventListener('click', function(){
+      var show = pass.type === 'password';
+      pass.type = show ? 'text' : 'password';
+      eyeOpen.style.display = show ? 'none' : 'block';
+      eyeClosed.style.display = show ? 'block' : 'none';
+      toggle.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+    });
+  }
+  var form = document.getElementById('loginForm');
+  var btn = document.getElementById('loginSubmit');
+  if (form && btn){
+    form.addEventListener('submit', function(){
+      btn.disabled = true;
+      btn.textContent = 'Memverifikasi akun...';
+    });
+  }
+})();
+</script>
 </body>
 </html>
