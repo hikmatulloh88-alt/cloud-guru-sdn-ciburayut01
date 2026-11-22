@@ -3,20 +3,25 @@ declare(strict_types=1);
 
 /*
  * Database Absensi SDN Ciburayut 01
- * IMPORTANT:
- * - Do not commit real hosting credentials to GitHub.
- * - Fill the values below only on the production server.
+ * Real credentials must be provided through server environment variables.
  */
 
-$host = 'localhost';
-$user = 'YOUR_DB_USER';
-$password = 'YOUR_DB_PASSWORD';
-$database = 'YOUR_DB_NAME';
+$host = getenv('ABSENSI_DB_HOST') ?: getenv('DB_HOST') ?: 'localhost';
+$user = getenv('ABSENSI_DB_USER') ?: getenv('DB_USER') ?: '';
+$password = getenv('ABSENSI_DB_PASS') ?: getenv('DB_PASS') ?: '';
+$database = getenv('ABSENSI_DB_NAME') ?: getenv('DB_NAME') ?: '';
+
+if ($user === '' || $database === '') {
+    http_response_code(500);
+    exit('Konfigurasi database Absensi belum disetel pada server.');
+}
 
 $koneksi = mysqli_connect($host, $user, $password, $database);
 
 if (!$koneksi) {
-    die('Koneksi database gagal: ' . mysqli_connect_error());
+    error_log('Cloud Guru Absensi database connection failed: ' . mysqli_connect_error());
+    http_response_code(500);
+    exit('Layanan database sementara tidak tersedia.');
 }
 
 mysqli_set_charset($koneksi, 'utf8mb4');
