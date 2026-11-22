@@ -33,6 +33,7 @@ deployment:
     - /bin/cp assets/js/page-image-upload.js $DEPLOYPATH/assets/js/page-image-upload.js
     - /bin/cp assets/js/visual-settings.js $DEPLOYPATH/assets/js/visual-settings.js
     - /bin/cp assets/css/cloud-guru-public-overrides.css $DEPLOYPATH/assets/css/cloud-guru-public-overrides.css
+    - /bin/cp assets/css/glass-ui.css $DEPLOYPATH/assets/css/glass-ui.css
     - /bin/cp index.php $DEPLOYPATH/index.php
     - /bin/mkdir -p $DEPLOYPATH/storage
     - /bin/cp storage/index.php $DEPLOYPATH/storage/
