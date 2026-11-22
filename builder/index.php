@@ -1097,7 +1097,15 @@ function save(action){
  setStatus(action==='publish'?'Mempublikasikan…':'Menyimpan draft…','');
  var buttons=[document.getElementById('saveDraftButton'),document.getElementById('publishButton')];buttons.forEach(function(b){b.disabled=true;});
  return fetch('/builder/',{method:'POST',credentials:'same-origin',body:fd,headers:{'Accept':'application/json'}})
- .then(function(resp){return resp.json().then(function(data){if(!resp.ok||!data.ok)throw new Error(data.message||'Operasi gagal.');return data;});})
+ .then(function(resp){return resp.text().then(function(text){
+   var data;
+   try{data=JSON.parse(text);}catch(parseError){
+    if(resp.redirected||/<html|<!doctype/i.test(text))throw new Error('Sesi login tidak terbaca. Muat ulang Editor Visual lalu login kembali.');
+    throw new Error(text.trim()||'Operasi penyimpanan gagal.');
+   }
+   if(!resp.ok||!data.ok)throw new Error(data.message||'Operasi penyimpanan gagal.');
+   return data;
+ });})
  .then(function(data){
   pageDirty=false;
   setStatus(data.message||'Berhasil.','success');

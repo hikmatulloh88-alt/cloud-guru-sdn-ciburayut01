@@ -352,13 +352,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Login - Cloud Guru</title>
 <link rel="stylesheet" href="../assets/css/main.css">
 <link rel="stylesheet" href="../assets/css/glass-ui.css?v=3">
+<link rel="stylesheet" href="/auth/login.css?v=1">
 </head>
 <body class="login-page">
 <main class="login-stage">
+<section class="login-aside" aria-label="Informasi portal sekolah">
+<div class="login-brand">
+<img src="/assets/images/logo-sekolah-ciburayut.svg" alt="Logo SDN Ciburayut 01">
+<span>SDN CIBURAYUT 01</span>
+</div>
+<div class="login-aside-copy">
+<span class="login-kicker">PORTAL SEKOLAH DIGITAL</span>
+<h2>Ruang kerja sekolah, dalam satu akun.</h2>
+<p>Kelola administrasi dan layanan pendidikan dengan akun yang sama seperti Aplikasi Absensi.</p>
+<div class="login-visual" aria-hidden="true">
+<span class="login-visual-orbit"></span>
+<span class="login-visual-card login-visual-card-main"><b>01</b><span>Cloud Guru</span></span>
+<span class="login-visual-card login-visual-card-small">Administrasi sekolah</span>
+</div>
+</div>
+<div class="login-aside-foot">Akses khusus warga sekolah</div>
+</section>
+<section class="login-panel">
 <div class="login-card">
-<div class="login-logo"><img src="/assets/images/logo-sekolah.svg" alt="Logo SDN Ciburayut 01"></div>
+<div class="login-heading">
+<span class="login-mobile-brand">Cloud Guru · SDN Ciburayut 01</span>
 <h1>Selamat Datang Kembali</h1>
 <p>Gunakan username dan password yang sama dengan Aplikasi Absensi.</p>
+</div>
 <?php if ($error): ?><div class="alert"><?=e($error)?></div><?php endif; ?>
 <form method="post" autocomplete="on">
 <input type="hidden" name="csrf_token" value="<?=e($loginCsrf)?>">
@@ -370,6 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </form>
 </div>
 <p class="login-caption">Akses aman · Portal Administrasi Guru</p>
+</section>
 </main>
 </body>
 </html>

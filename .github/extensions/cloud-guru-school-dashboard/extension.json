@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "initialization": "module",
+  "canvases": [
+    {
+      "id": "cloud-guru-school-dashboard",
+      "displayName": "School Website Dashboard",
+      "description": "Shows school website status and provides quick operational links and tasks.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "baseUrl": {
+            "type": "string",
+            "description": "Public or local base URL for the school website."
+          },
+          "workspaceRoot": {
+            "type": "string",
+            "description": "Repository workspace path for this dashboard instance."
+          }
+        }
+      },
+      "actions": [
+        {
+          "name": "set_note",
+          "description": "Updates the dashboard note.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "note": { "type": "string", "maxLength": 4000 }
+            },
+            "required": ["note"]
+          }
+        },
+        {
+          "name": "add_task",
+          "description": "Adds an operational task.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string", "minLength": 1, "maxLength": 200 }
+            },
+            "required": ["title"]
+          }
+        },
+        {
+          "name": "toggle_task",
+          "description": "Marks a task complete or incomplete.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "taskId": { "type": "string", "minLength": 1, "maxLength": 100 }
+            },
+            "required": ["taskId"]
+          }
+        },
+        {
+          "name": "remove_task",
+          "description": "Removes an operational task.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "taskId": { "type": "string", "minLength": 1, "maxLength": 100 }
+            },
+            "required": ["taskId"]
+          }
+        },
+        {
+          "name": "set_base_url",
+          "description": "Changes the website base URL.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "baseUrl": { "type": "string", "maxLength": 2048 }
+            },
+            "required": ["baseUrl"]
+          }
+        }
+      ]
+    }
+  ]
+}

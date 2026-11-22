@@ -307,7 +307,15 @@ function renderGroup(id){
 function loadSettings(){
  loading=true;setStatus('Memuat pengaturan website…','');
  fetch('/builder/settings.php',{method:'GET',credentials:'same-origin',headers:{'Accept':'application/json'},cache:'no-store'})
- .then(function(r){return r.json().then(function(d){if(!r.ok||!d.ok)throw new Error(d.message||'Pengaturan gagal dimuat.');return d;});})
+ .then(function(r){return r.text().then(function(text){
+   var d;
+   try{d=JSON.parse(text);}catch(parseError){
+    if(r.redirected||/<html|<!doctype/i.test(text))throw new Error('Sesi login tidak terbaca. Muat ulang Editor Visual lalu login kembali.');
+    throw new Error(text.trim()||'Pengaturan gagal dimuat.');
+   }
+   if(!r.ok||!d.ok)throw new Error(d.message||'Pengaturan gagal dimuat.');
+   return d;
+ });})
  .then(function(d){values=d.settings||{};dirty=false;renderGroup(activeGroup);setStatus('Pengaturan dimuat. Pilih tab, ubah nilai, lalu simpan.','success');})
  .catch(function(e){setStatus(e.message||'Pengaturan gagal dimuat.','error');})
  .finally(function(){loading=false;});
@@ -321,7 +329,15 @@ function saveSettings(action){
  loading=true;saveBtn.disabled=true;publishBtn.disabled=true;
  setStatus(action==='publish'?'Menyimpan dan memublikasikan…':'Menyimpan draft pengaturan…','');
  fetch('/builder/settings.php',{method:'POST',credentials:'same-origin',body:form,headers:{'Accept':'application/json'}})
- .then(function(r){return r.json().then(function(d){if(!r.ok||!d.ok)throw new Error(d.message||'Pengaturan gagal disimpan.');return d;});})
+ .then(function(r){return r.text().then(function(text){
+   var d;
+   try{d=JSON.parse(text);}catch(parseError){
+    if(r.redirected||/<html|<!doctype/i.test(text))throw new Error('Sesi login tidak terbaca. Muat ulang Editor Visual lalu login kembali.');
+    throw new Error(text.trim()||'Pengaturan gagal disimpan.');
+   }
+   if(!r.ok||!d.ok)throw new Error(d.message||'Pengaturan gagal disimpan.');
+   return d;
+ });})
  .then(function(d){
   dirty=false;
   setStatus(d.message||'Pengaturan tersimpan.', 'success');
