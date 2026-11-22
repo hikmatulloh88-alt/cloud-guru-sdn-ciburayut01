@@ -324,6 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Login - Cloud Guru</title>
 <link rel="stylesheet" href="../assets/css/main.css">
+<link rel="stylesheet" href="../assets/css/glass-ui.css?v=1">
 </head>
 <body class="login-page">
 <div class="login-card">

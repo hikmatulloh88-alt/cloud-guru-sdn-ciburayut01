@@ -1,0 +1,243 @@
+:root {
+  --cg-glass-border: rgba(255, 255, 255, .58);
+  --cg-glass-shadow: 0 18px 48px rgba(31, 51, 91, .14);
+  --cg-glass-blur: saturate(155%) blur(18px);
+}
+
+/* Public navigation */
+.published-header:not(.header-transparent):not(.header-overlay) {
+  background: rgba(248, 251, 255, .68) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .72) !important;
+  box-shadow: 0 10px 35px rgba(26, 48, 86, .09) !important;
+  -webkit-backdrop-filter: var(--cg-glass-blur);
+  backdrop-filter: var(--cg-glass-blur);
+}
+.published-header.header-overlay {
+  background: rgba(7, 23, 48, .38) !important;
+  border-bottom-color: rgba(255, 255, 255, .2) !important;
+  -webkit-backdrop-filter: saturate(145%) blur(16px);
+  backdrop-filter: saturate(145%) blur(16px);
+}
+.published-header .ph-nav {
+  padding: 6px !important;
+  border: 1px solid rgba(255, 255, 255, .78) !important;
+  background: rgba(255, 255, 255, .48) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .8), 0 7px 22px rgba(29, 48, 85, .08);
+  -webkit-backdrop-filter: var(--cg-glass-blur);
+  backdrop-filter: var(--cg-glass-blur);
+}
+.published-header .ph-nav a {
+  border: 1px solid transparent;
+  transition: background .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.published-header .ph-nav a:hover,
+.published-header .ph-nav a.is-current {
+  border-color: rgba(255, 255, 255, .82);
+  background: rgba(255, 255, 255, .82) !important;
+  box-shadow: 0 5px 16px rgba(31, 51, 91, .1) !important;
+  transform: translateY(-1px);
+}
+.published-header .ph-nav a.ph-cta,
+.published-header > .ph-cta {
+  border: 1px solid rgba(255, 255, 255, .42);
+  -webkit-backdrop-filter: saturate(150%) blur(12px);
+  backdrop-filter: saturate(150%) blur(12px);
+}
+.published-header .ph-menu {
+  border: 1px solid rgba(255, 255, 255, .68);
+  background: rgba(255, 255, 255, .56);
+  box-shadow: 0 6px 18px rgba(31, 51, 91, .1);
+  -webkit-backdrop-filter: var(--cg-glass-blur);
+  backdrop-filter: var(--cg-glass-blur);
+}
+@media (max-width: 760px) {
+  .published-header .ph-nav {
+    border-radius: 18px !important;
+    background: rgba(248, 251, 255, .78) !important;
+    box-shadow: 0 20px 55px rgba(16, 35, 67, .2), inset 0 1px rgba(255, 255, 255, .9) !important;
+  }
+}
+
+/* Shared frosted cards on the public site */
+.public-page-section,
+.public-news-card,
+.public-news-detail,
+.public-teacher-card,
+.agenda-public-card,
+.contact-row {
+  border-color: rgba(255, 255, 255, .78) !important;
+  background: rgba(255, 255, 255, .72) !important;
+  box-shadow: 0 14px 36px rgba(28, 48, 82, .09), inset 0 1px rgba(255, 255, 255, .82) !important;
+  -webkit-backdrop-filter: saturate(145%) blur(14px);
+  backdrop-filter: saturate(145%) blur(14px);
+}
+
+/* Login */
+body.login-page {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  overflow: hidden;
+  padding: 28px 16px;
+  background:
+    radial-gradient(ellipse at 18% 18%, rgba(114, 139, 255, .48), transparent 38%),
+    radial-gradient(ellipse at 83% 82%, rgba(111, 84, 220, .36), transparent 35%),
+    linear-gradient(135deg, #eaf1ff, #f8f6ff 54%, #e8f4ff) !important;
+  color: #17243a;
+}
+body.login-page:before,
+body.login-page:after {
+  position: fixed;
+  z-index: -1;
+  width: 290px;
+  height: 290px;
+  border: 1px solid rgba(255, 255, 255, .58);
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .28), rgba(91, 124, 235, .08));
+  box-shadow: inset 0 1px rgba(255, 255, 255, .6), 0 25px 70px rgba(65, 87, 160, .1);
+  content: "";
+  pointer-events: none;
+}
+body.login-page:before { top: -165px; left: -90px; }
+body.login-page:after { right: -120px; bottom: -180px; width: 390px; height: 390px; }
+body.login-page .login-card {
+  position: relative;
+  width: min(440px, 100%);
+  margin: 0 !important;
+  padding: clamp(28px, 6vw, 46px) !important;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .78) !important;
+  border-radius: 27px !important;
+  background: rgba(255, 255, 255, .56) !important;
+  box-shadow: 0 28px 80px rgba(39, 57, 108, .18), inset 0 1px rgba(255, 255, 255, .9) !important;
+  -webkit-backdrop-filter: saturate(165%) blur(24px);
+  backdrop-filter: saturate(165%) blur(24px);
+}
+body.login-page .logo {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, .78);
+  border-radius: 19px;
+  background: linear-gradient(145deg, rgba(83, 112, 228, .92), rgba(121, 92, 216, .9));
+  box-shadow: 0 12px 26px rgba(73, 91, 196, .24), inset 0 1px rgba(255, 255, 255, .45);
+  color: #fff;
+  font-size: 28px;
+}
+body.login-page .login-card h1 {
+  margin: 0 0 9px;
+  color: #1d2b45;
+  font-size: clamp(24px, 6vw, 30px);
+  letter-spacing: -.04em;
+}
+body.login-page .login-card p { color: #68758d; line-height: 1.65; }
+body.login-page .login-card form { display: grid; gap: 9px; margin-top: 24px; }
+body.login-page .login-card label { margin-top: 8px; color: #3a4962; font-size: 13px; font-weight: 750; }
+body.login-page .login-card input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgba(155, 169, 197, .42);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .67);
+  color: #17243a;
+  box-shadow: inset 0 1px 3px rgba(40, 56, 90, .04);
+}
+body.login-page .login-card input:focus {
+  border-color: #768aeb;
+  outline: 3px solid rgba(112, 134, 234, .16);
+}
+body.login-page .login-card .btn.primary,
+body.login-page .login-card button {
+  min-height: 49px;
+  margin-top: 13px;
+  border: 1px solid rgba(255, 255, 255, .32);
+  border-radius: 13px;
+  background: linear-gradient(110deg, #4768dd, #765bd5);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(74, 91, 196, .25);
+}
+body.login-page .login-card .alert {
+  padding: 12px 14px;
+  border: 1px solid rgba(229, 106, 106, .24);
+  border-radius: 12px;
+  background: rgba(255, 237, 237, .78);
+  color: #a63c43;
+}
+
+/* Glass panels in Storage */
+body.storage-page {
+  background:
+    radial-gradient(ellipse at 8% 0%, rgba(210, 220, 255, .78), transparent 36%),
+    radial-gradient(ellipse at 95% 80%, rgba(228, 214, 255, .42), transparent 34%),
+    #f5f7fb;
+}
+body.storage-page .status-card,
+body.storage-page .panel {
+  border-color: rgba(255, 255, 255, .78);
+  background: rgba(255, 255, 255, .64);
+  box-shadow: 0 14px 40px rgba(36, 54, 91, .09), inset 0 1px rgba(255, 255, 255, .86);
+  -webkit-backdrop-filter: saturate(155%) blur(18px);
+  backdrop-filter: saturate(155%) blur(18px);
+}
+body.storage-page .upload-form {
+  border-color: rgba(117, 137, 213, .34);
+  background: rgba(248, 250, 255, .55);
+}
+body.storage-page .drive-file {
+  border-color: rgba(255, 255, 255, .88);
+  background: rgba(255, 255, 255, .7);
+  box-shadow: 0 8px 24px rgba(37, 56, 94, .08), inset 0 1px rgba(255, 255, 255, .85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+body.storage-page .drive-menu {
+  border-color: rgba(255, 255, 255, .85);
+  background: rgba(250, 252, 255, .9);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+/* Visual editor and AI Studio tool chrome */
+body.cgv-editor { background: radial-gradient(ellipse at 20% 0, #e4eaff, transparent 38%), #edf1f8; }
+body.cgv-editor .topbar {
+  border-bottom-color: rgba(255, 255, 255, .75);
+  background: rgba(248, 251, 255, .72);
+  box-shadow: 0 10px 30px rgba(34, 52, 89, .1);
+  -webkit-backdrop-filter: var(--cg-glass-blur);
+  backdrop-filter: var(--cg-glass-blur);
+}
+body.cgv-editor .panel {
+  border-color: rgba(255, 255, 255, .76);
+  background: rgba(255, 255, 255, .72);
+  box-shadow: 0 12px 32px rgba(34, 52, 89, .08), inset 0 1px rgba(255, 255, 255, .84);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+body.cgv-editor .canvas-wrap { background: rgba(222, 230, 245, .58); }
+body.ai-studio-page .card {
+  border-color: rgba(172, 190, 255, .2);
+  background: rgba(20, 28, 50, .72);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, .22), inset 0 1px rgba(255, 255, 255, .08);
+  -webkit-backdrop-filter: saturate(145%) blur(18px);
+  backdrop-filter: saturate(145%) blur(18px);
+}
+body.ai-studio-page .top .logo {
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: rgba(142, 162, 255, .2);
+  box-shadow: 0 10px 28px rgba(95, 119, 230, .2), inset 0 1px rgba(255, 255, 255, .2);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+@media (max-width: 520px) {
+  body.login-page .login-card { border-radius: 22px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .published-header .ph-nav a { transition: none; }
+}

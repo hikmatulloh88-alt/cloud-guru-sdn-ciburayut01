@@ -479,8 +479,9 @@ button,input,select{font:inherit}button{border:0;border-radius:9px;padding:10px 
 @media(max-width:1100px){.workspace{grid-template-columns:180px minmax(280px,1fr)}.right-panel{grid-column:1/-1}.right-panel .right-body{display:grid;grid-template-columns:1fr 1fr;gap:10px}.right-panel .panel-title{padding-bottom:7px}}
 @media(max-width:700px){.topbar{flex-wrap:wrap;padding:9px}.brand{width:100%}.page-select{flex:1;max-width:none}.top-spacer{display:none}.status{flex:1}.workspace{display:flex;flex-direction:column;padding:8px}.left-panel{order:2}.center-panel{order:1}.right-panel{order:3}.insert-list{grid-template-columns:repeat(2,minmax(0,1fr))}.insert-button{font-size:12px;padding:8px}.insert-button .ico{flex-shrink:0}.canvas-wrap{padding:7px;min-height:420px}#siteFrame{height:68vh;min-height:430px}.right-panel .right-body{display:block}.topbar .btn-outline,.topbar .btn-primary,.topbar .btn-green{padding:9px;font-size:12px}}
 </style>
+<link rel="stylesheet" href="/assets/css/glass-ui.css?v=1">
 </head>
-<body>
+<body class="cgv-editor">
 <header class="topbar">
   <div class="brand">🧱 Editor Visual <small>Cloud Guru · SDN Ciburayut 01</small></div>
   <select id="pageSelect" class="page-select" aria-label="Pilih halaman"></select>
