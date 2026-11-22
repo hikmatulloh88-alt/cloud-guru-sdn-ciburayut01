@@ -155,6 +155,32 @@ function gdrive_about(int $userId): array {
     $r=gdrive_api($userId,'GET','https://www.googleapis.com/drive/v3/about?fields=user(displayName,emailAddress)');
     return is_array($r)?$r:[];
 }
+function gdrive_file_belongs_to_user(int $userId, string $fileId): bool {
+    global $pdo;
+    if ($fileId === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $fileId)) return false;
+    gdrive_require_tables();
+    $stmt = $pdo->prepare('SELECT * FROM google_drive_connections WHERE user_id=? LIMIT 1');
+    $stmt->execute([$userId]);
+    $connection = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$connection || empty($connection['refresh_token_enc'])) return false;
+    $allowedParents = array_filter([
+        (string)($connection['root_folder_id'] ?? ''),
+        (string)($connection['administrasi_folder_id'] ?? ''),
+        (string)($connection['perencanaan_folder_id'] ?? ''),
+        (string)($connection['asesmen_folder_id'] ?? ''),
+    ], static fn(string $id): bool => $id !== '');
+    if (!$allowedParents) return false;
+    $meta = gdrive_api(
+        $userId,
+        'GET',
+        'https://www.googleapis.com/drive/v3/files/' . rawurlencode($fileId) . '?fields=id,parents'
+    );
+    if (!is_array($meta) || (string)($meta['id'] ?? '') !== $fileId) return false;
+    foreach ((array)($meta['parents'] ?? []) as $parentId) {
+        if (in_array((string)$parentId, $allowedParents, true)) return true;
+    }
+    return false;
+}
 function gdrive_ensure_structure(int $userId): void {
     global $pdo;
     gdrive_require_tables();

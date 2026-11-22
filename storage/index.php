@@ -164,6 +164,8 @@ select,input{font:14px system-ui,sans-serif;padding:10px;border:1px solid #dadce
 </style></head><body><main class="wrap"><p style="margin:0 0 14px"><a href="/dashboard/index.php" style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 13px;color:#155eef;text-decoration:none;font-weight:650">← Kembali ke Beranda Akun</a></p><h1>Penyimpanan Saya</h1><p class="muted">Cloud Guru · SDN Ciburayut 01</p>
 <section class="card"><div class="row"><strong>Status Google Drive</strong><?php if($connection && !empty($connection['refresh_token_enc'])): ?><span class="ok">Terhubung<?= !empty($connection['google_email'])?' · '.h($connection['google_email']):'' ?></span><?php else: ?><span class="error">Belum terhubung</span><?php endif; ?><a class="btn" href="/gdrive/connect.php">Hubungkan Google Drive</a></div>
 <?php if(isset($_GET['gdrive'])&&$_GET['gdrive']==='connected'): ?><p class="ok">Google Drive berhasil dihubungkan.</p><?php endif; ?>
+<?php if(isset($_GET['uploaded'])&&$_GET['uploaded']==='1'): ?><p class="ok">File berhasil diunggah.</p><?php endif; ?>
+<?php if(isset($_GET['deleted'])&&$_GET['deleted']==='1'): ?><p class="ok">File berhasil dihapus.</p><?php endif; ?>
 <?php if($error!==''): ?><p class="error"><?=h($error)?></p><?php endif; ?>
 </section>
 <section class="card"><div class="row"><form method="get"><label for="folder">Folder: </label><select id="folder" name="folder" onchange="this.form.submit()"><?php foreach($folders as $key=>$label): ?><option value="<?=h($key)?>" <?=$selected===$key?'selected':''?>><?=h($label)?></option><?php endforeach; ?></select></form>

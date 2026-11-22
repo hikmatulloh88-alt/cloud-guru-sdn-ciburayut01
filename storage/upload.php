@@ -44,7 +44,20 @@ try{
  $folderKey=(string)($_POST['folder']??'root_folder_id');
  $allowed=['root_folder_id','administrasi_folder_id','perencanaan_folder_id','asesmen_folder_id'];
  if(!in_array($folderKey,$allowed,true))$folderKey='root_folder_id';
- if(empty($_FILES['file'])||$_FILES['file']['error']!==UPLOAD_ERR_OK)throw new RuntimeException('File belum dipilih atau upload PHP gagal.');
+ if(empty($_FILES['file']))throw new RuntimeException('File belum dipilih.');
+ $uploadError=(int)$_FILES['file']['error'];
+ if($uploadError!==UPLOAD_ERR_OK){
+   $uploadMessages=[
+     UPLOAD_ERR_INI_SIZE=>'Ukuran file melebihi batas konfigurasi server.',
+     UPLOAD_ERR_FORM_SIZE=>'Ukuran file melebihi batas form.',
+     UPLOAD_ERR_PARTIAL=>'File hanya terunggah sebagian. Pilih dan unggah ulang.',
+     UPLOAD_ERR_NO_FILE=>'Tidak ada file yang dipilih.',
+     UPLOAD_ERR_NO_TMP_DIR=>'Folder sementara upload tidak tersedia di server.',
+     UPLOAD_ERR_CANT_WRITE=>'Server tidak dapat menulis file upload.',
+     UPLOAD_ERR_EXTENSION=>'Upload dihentikan oleh ekstensi PHP.',
+   ];
+   throw new RuntimeException($uploadMessages[$uploadError]??'Upload PHP gagal.');
+ }
  $f=$_FILES['file']; $max=defined('GOOGLE_DRIVE_MAX_UPLOAD')?(int)GOOGLE_DRIVE_MAX_UPLOAD:26214400;
  if((int)$f['size']<1||(int)$f['size']>$max)throw new RuntimeException('Ukuran file kosong atau melebihi batas upload server.');
  $q=$pdo->prepare('SELECT * FROM google_drive_connections WHERE user_id=?');$q->execute([$uid]);$conn=$q->fetch(PDO::FETCH_ASSOC);
