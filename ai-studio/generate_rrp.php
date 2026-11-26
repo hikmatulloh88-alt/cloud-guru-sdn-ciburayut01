@@ -37,7 +37,7 @@ $apiKey = getenv('OPENAI_API_KEY') ?: '';
 $html = '';
 
 if ($apiKey !== '' && extension_loaded('curl')) {
-    $prompt = "Buatlah Rencana Pelaksanaan Pembelajaran (RPP) lengkap untuk sekolah dasar kurikulum Indonesia dengan format HTML. Data: Sekolah=$sekolah, Mapel=$mapel, Kelas=$kelas, Semester=$semester, Tema=$tema, SubTema=$subTema, Materi=$materi, Alokasi=$alokasi, Metode=$metode, Model=$model, Sumber=$sumber. Sertakan: identitas, tujuan, materi pokok, langkah kegiatan (awal/inti/akhir), penilaian, dan sumber belajar. Output hanya HTML, tanpa penjelasan di luar HTML.";
+    $prompt = "Buatlah Rencana Pelaksanaan Pembelajaran (RPP) lengkap untuk sekolah dasar kurikulum Indonesia dengan format HTML. Data: Sekolah=$sekolah, Nama Guru=$namaGuru, NIP=$nip, Mapel=$mapel, Kelas=$kelas, Semester=$semester, Tema=$tema, SubTema=$subTema, Materi=$materi, Alokasi=$alokasi, Metode=$metode, Model=$model, Sumber=$sumber. Sertakan: identitas, tujuan, materi pokok, langkah kegiatan (awal/inti/akhir), penilaian, dan sumber belajar. Output hanya HTML, tanpa penjelasan di luar HTML.";
     $ch = curl_init('https://api.openai.com/v1/chat/completions');
     curl_setopt_array($ch, [
         CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 60,
@@ -56,12 +56,12 @@ if ($apiKey !== '' && extension_loaded('curl')) {
 }
 
 if ($html === '') {
-    $html = buildLocalRRP($sekolah, $mapel, $kelas, $semester, $tema, $subTema, $materi, $alokasi, $metode, $model, $sumber);
+    $html = buildLocalRRP($sekolah, $namaGuru, $nip, $mapel, $kelas, $semester, $tema, $subTema, $materi, $alokasi, $metode, $model, $sumber);
 }
 
 reply(200, ['html' => $html]);
 
-function buildLocalRRP(string $s, string $m, string $k, string $sem, string $t, string $st, string $mat, string $alok, string $met, string $model, string $sum): string {
+function buildLocalRRP(string $s, string $ng, string $nip, string $m, string $k, string $sem, string $t, string $st, string $mat, string $alok, string $met, string $model, string $sum): string {
     $esc = fn(string $x): string => htmlspecialchars((string)$x, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $subTemaHtml = $st !== '' ? '<tr><th style="width:30%">Sub Tema</th><td>' . $esc($st) . '</td></tr>' : '';
     $out = <<<HTML
@@ -72,7 +72,7 @@ function buildLocalRRP(string $s, string $m, string $k, string $sem, string $t, 
 </div>
 
 <table>
-  <tr><th style="width:30%">Sekolah</th><td>{$esc($s)}</td></tr>
+  <tr><th style="width:30%">Sekolah</th><td>{$esc($s)}</td></tr>\n  <tr><th>Nama Guru</th><td>{$esc($ng)}</td></tr>\n  <tr><th>NIP</th><td>{$esc($nip)}</td></tr>
   <tr><th>Mata Pelajaran</th><td>{$esc($m)}</td></tr>
   <tr><th>Kelas / Semester</th><td>{$esc($k)} / {$esc($sem)}</td></tr>
   {$subTemaHtml}
@@ -101,7 +101,7 @@ function buildLocalRRP(string $s, string $m, string $k, string $sem, string $t, 
 
 <h2>IV. Langkah-Langkah Kegiatan</h2>
 
-<h3>A. Kegiatan Awal (±10 menit)</h3>
+<h3>A. Kegiatan Awal (Â±10 menit)</h3>
 <ul>
   <li>Guru membuka pelajaran dengan sapaan dan memeriksa kehadiran peserta didik.</li>
   <li>Guru memberikan apersepsi terkait tema {$esc($t)} untuk menarik perhatian peserta didik.</li>
@@ -109,7 +109,7 @@ function buildLocalRRP(string $s, string $m, string $k, string $sem, string $t, 
   <li>Guru memberikan motivasi terkait manfaat mempelajari {$esc($m)}.</li>
 </ul>
 
-<h3>B. Kegiatan Inti (±{$alok})</h3>
+<h3>B. Kegiatan Inti (Â±{$alok})</h3>
 <ul>
   <li>Guru menyampaikan materi pokok {$esc($mat)} menggunakan metode {$esc($met)}.</li>
   <li>Peserta didik aktif berdiskusi dan menanyakan hal yang belum dipahami.</li>
@@ -118,7 +118,7 @@ function buildLocalRRP(string $s, string $m, string $k, string $sem, string $t, 
   <li>Guru memberikan umpan balik dan memperkuat pemahaman peserta didik.</li>
 </ul>
 
-<h3>C. Kegiatan Akhir (±10 menit)</h3>
+<h3>C. Kegiatan Akhir (Â±10 menit)</h3>
 <ul>
   <li>Guru dan peserta didik bersama-sama menyimpulkan materi yang telah dipelajari.</li>
   <li>Guru memberikan refleksi singkat tentang kegiatan pembelajaran.</li>
