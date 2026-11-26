@@ -300,6 +300,17 @@ function dash_e($v): string {
         </div>
       </a>
 
+      <a class="dashboard-card" href="/ai-studio/rrp.php">
+        <div class="card-top">
+          <div class="card-icon ic-indigo"><?= cg_sidebar_svg('layout') ?></div>
+          <span class="card-arrow" aria-hidden="true">→</span>
+        </div>
+        <div>
+          <h3>Buat RPP</h3>
+          <p>Hasilkan Rencana Pelaksanaan Pembelajaran lengkap, lalu unduh dalam format .DOC.</p>
+        </div>
+      </a>
+
       <a class="dashboard-card" href="/guru/">
         <div class="card-top">
           <div class="card-icon ic-amber"><?= cg_sidebar_svg('user') ?></div>

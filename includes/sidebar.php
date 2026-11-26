@@ -252,6 +252,7 @@ body.cg-sidebar-ready .cg-main-content{margin-left:var(--cg-content-offset);tran
     cg_sidebar_link('/storage/index.php?folder=perencanaan_folder_id', 'calendar', 'Perencanaan');
     cg_sidebar_link('/storage/index.php?folder=asesmen_folder_id', 'check-square', 'Asesmen');
     cg_sidebar_link('/ai-studio/index.php', 'sparkles', 'AI Studio', ['/ai-studio'], 'AI');
+    cg_sidebar_link('/ai-studio/rrp.php', 'layout', 'Buat RPP', ['/ai-studio/rrp.php']);
     ?>
     <div class="cg-divider"></div>
     <div class="cg-section-title">Akun Saya</div>
